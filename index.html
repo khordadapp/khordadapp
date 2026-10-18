@@ -7,8 +7,42 @@
 <title>ویترین خرداد</title>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+<script>
+  // اعمال فوری تم ذخیره‌شده روی دستگاه (قبل از رندر) تا چشمک نزنه
+  (function(){
+    try{
+      var t = localStorage.getItem('khordad_theme');
+      document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+    }catch(e){
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
 <style>
-  :root{
+  /* حالت روز (پیش‌فرض) */
+  :root, [data-theme="light"]{
+    --bg:#f4f6fb;
+    --surface:#ffffff;
+    --card:#ffffff;
+    --card-hover:#f0f4ff;
+    --border:rgba(0,0,0,.08);
+    --text:#1a1f36;
+    --muted:#5a6480;
+    --accent:#3b7cff;
+    --accent2:#6b4dff;
+    --gold:#d4a017;
+    --radius:18px;
+    --shadow:0 12px 40px rgba(0,0,0,.1);
+    --topbar-bg:rgba(255,255,255,.82);
+    --toast-bg:rgba(255,255,255,.96);
+    --body-gradient:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(59,124,255,.12), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(107,77,255,.1), transparent),
+      radial-gradient(ellipse 50% 30% at 50% 100%, rgba(212,160,23,.06), transparent);
+  }
+
+  /* حالت شب */
+  [data-theme="dark"]{
     --bg:#0b0f1a;
     --surface:#12182a;
     --card:#171e33;
@@ -19,19 +53,45 @@
     --accent:#4f8cff;
     --accent2:#7c5cff;
     --gold:#f0c14b;
-    --radius:18px;
     --shadow:0 12px 40px rgba(0,0,0,.35);
+    --topbar-bg:rgba(11,15,26,.75);
+    --toast-bg:rgba(23,30,51,.95);
+    --body-gradient:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(79,140,255,.25), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(124,92,255,.2), transparent),
+      radial-gradient(ellipse 50% 30% at 50% 100%, rgba(240,193,75,.08), transparent);
   }
+
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html{scroll-behavior:smooth}
+
+  /* غیرفعال کردن انتخاب متن و کشیدن تصاویر */
+  body, body *{
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+  }
+  img{
+    -webkit-user-drag:none;
+    user-drag:none;
+    pointer-events:none;
+  }
+  a, button, .theme-btn{
+    pointer-events:auto;
+  }
+
   body{
     font-family:"Vazirmatn",Tahoma,sans-serif;
     background:var(--bg);
     color:var(--text);
     line-height:1.7;
     min-height:100vh;
+    transition:background .3s, color .3s;
   }
   a,button{outline:none;-webkit-tap-highlight-color:transparent}
+
   /* ریپل خاکستری شبیه اندروید */
   .ripple-host{position:relative;overflow:hidden}
   .ripple-ink{
@@ -48,21 +108,20 @@
   body::before{
     content:"";
     position:fixed;inset:0;z-index:-1;
-    background:
-      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(79,140,255,.25), transparent),
-      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(124,92,255,.2), transparent),
-      radial-gradient(ellipse 50% 30% at 50% 100%, rgba(240,193,75,.08), transparent);
+    background:var(--body-gradient);
+    transition:background .3s;
   }
 
   /* Header */
   .topbar{
     position:sticky;top:0;z-index:50;
     backdrop-filter:blur(16px);
-    background:rgba(11,15,26,.75);
+    background:var(--topbar-bg);
     border-bottom:1px solid var(--border);
     padding:12px 16px;
     display:flex;align-items:center;justify-content:space-between;
     gap:12px;
+    transition:background .3s, border-color .3s;
   }
   .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem}
   .brand-dot{
@@ -71,7 +130,7 @@
     display:grid;place-items:center;font-size:14px;font-weight:800;
     box-shadow:0 0 20px rgba(79,140,255,.4);
   }
-  .topbar-actions{display:flex;gap:8px}
+  .topbar-actions{display:flex;gap:8px;align-items:center}
   .chip{
     border:1px solid var(--border);
     background:var(--surface);
@@ -81,6 +140,23 @@
     transition:.2s;
   }
   .chip:hover{color:var(--text);border-color:var(--accent)}
+
+  /* دکمه حالت شب/روز */
+  .theme-btn{
+    width:36px;height:36px;border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    cursor:pointer;
+    display:grid;place-items:center;
+    font-size:16px;
+    transition:.2s;
+    flex-shrink:0;
+  }
+  .theme-btn:hover{
+    border-color:var(--accent);
+    background:var(--card-hover);
+  }
 
   .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
 
@@ -241,7 +317,7 @@
     gap:12px;
   }
   .service-card{
-    background:linear-gradient(160deg,var(--card),#1a2038);
+    background:linear-gradient(160deg,var(--card),var(--surface));
     border:1px solid var(--border);
     border-radius:16px;
     padding:14px 10px;
@@ -262,13 +338,11 @@
   /* Footer */
   footer{
     text-align:center;
-    padding:28px 16px;
+    padding:20px 16px 28px;
     color:var(--muted);
     font-size:.8rem;
-    border-top:1px solid var(--border);
-    margin-top:20px;
+    margin-top:12px;
   }
-  footer strong{color:var(--text)}
 
   /* Image fallback placeholder */
   .img-ph{
@@ -284,13 +358,13 @@
   .toast{
     position:fixed;bottom:24px;left:50%;
     transform:translateX(-50%) translateY(120px);
-    background:rgba(23,30,51,.95);
+    background:var(--toast-bg);
     border:1px solid var(--border);
     color:var(--text);
     padding:12px 20px;border-radius:14px;
     font-size:.85rem;z-index:100;
     box-shadow:var(--shadow);
-    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+    transition:transform .4s cubic-bezier(.2,.8,.2,1), background .3s, color .3s;
     max-width:90vw;text-align:center;
   }
   .toast.show{transform:translateX(-50%) translateY(0)}
@@ -307,7 +381,7 @@
     font-size:18px;
   }
   #toTop.show{opacity:1;pointer-events:auto}
-  #toTop:hover{background:var(--accent);border-color:var(--accent)}
+  #toTop:hover{background:var(--accent);border-color:var(--accent);color:#fff}
 
   @media (max-width:700px){
     .icon-grid{grid-template-columns:repeat(4,1fr);gap:8px}
@@ -331,8 +405,9 @@
     <span>ویترین خرداد</span>
   </div>
   <div class="topbar-actions">
-    <a class="chip" href="https://khordadapp.blogfa.com/page/gapzehn" target="_blank" rel="noopener">گفت‌وگو</a>
-    <a class="chip" href="https://khordadapp.blogfa.com/page/ranking" target="_blank" rel="noopener">رتبه‌بندی</a>
+    <button class="theme-btn" id="themeToggle" type="button" title="تغییر حالت روز/شب" aria-label="تغییر حالت روز و شب">🌙</button>
+    <a class="chip" href="https://khordadapp.github.io/khordadapp/gapzehn.html" target="_blank" rel="noopener">گفت‌وگو</a>
+
   </div>
 </header>
 
@@ -340,8 +415,8 @@
 
   <!-- Hero -->
   <section class="hero">
-    <a href="https://khordadapp.blogfa.com/page/gapzehn" target="_blank" rel="noopener" title="گفت‌وگوی خرداد">
-      <img src="https://abrehamrahi.ir/o/public/FFFdePgc/" alt="گفت‌وگوی خرداد"
+    <a href="#" target="_blank" rel="noopener" title="گفت‌وگوی خرداد">
+      <img src="https://abrehamrahi.ir/o/public/pBiC8hG4/" alt="گفت‌وگوی خرداد"
            onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'hero-fallback\'>گفت‌وگوی خرداد — برای ورود کلیک کنید</div>';">
     </a>
   </section>
@@ -366,12 +441,12 @@
       <span class="section-sub">ابزار و بخش‌های پرکاربرد</span>
     </div>
     <div class="icon-grid">
-      <a class="icon-card" href="http://khordadapp.blogfa.com/page/ramazan1402" target="_blank" rel="noopener">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/mazhabi.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/V378JmgW/" alt="رمضان"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>رمضان</div>';">
-        <span>رمضان</span>
+        <span>مذهبی</span>
       </a>
-      <a class="icon-card" href="https://khordadapp.blogfa.com/page/ranking" target="_blank" rel="noopener">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/rotbe.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/G0nhkFDd/" alt="رتبه‌بندی"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>رتبه</div>';">
         <span>رتبه‌بندی</span>
@@ -381,12 +456,12 @@
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>سلامت</div>';">
         <span>سلامت‌نیوز</span>
       </a>
-      <a class="icon-card" href="http://khordadapp.blogfa.com/page/maghalat" target="_blank" rel="noopener">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/maghale.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/O1nZrOok/" alt="مقالات"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>مقاله</div>';">
         <span>مقالات</span>
       </a>
-      <a class="icon-card" href="http://khordadapp.blogfa.com/page/weather" target="_blank" rel="noopener">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/wether.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/L8ap1X85/" alt="هواشناسی"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>هوا</div>';">
         <span>هواشناسی</span>
@@ -396,22 +471,22 @@
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>خبر</div>';">
         <span>فارس‌نیوز</span>
       </a>
-      <a class="icon-card" href="http://khordadapp.blogfa.com/page/shaba" target="_blank" rel="noopener">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/sheba.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/sQwzfPDq/" alt="شبا"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>شبا</div>';">
         <span>شبا</span>
       </a>
-      <a class="icon-card" href="http://khordadapp.blogfa.com/page/football" target="_blank" rel="noopener">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/football.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/c6ZM83sk/" alt="فوتبال"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>فوتبال</div>';">
         <span>فوتبال</span>
       </a>
-      <a class="icon-card" href="https://khordadapp.blogfa.com/page/gapzehn" target="_blank" rel="noopener">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/gapzehn.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/1K0fp4ss/" alt="گفت‌وگو"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>چت</div>';">
         <span>گفت‌وگو</span>
       </a>
-      <a class="icon-card" href="http://khordadapp.blogfa.com/page/game" target="_blank" rel="noopener">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/bazi.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/1QJgKaG0/" alt="بازی"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>بازی</div>';">
         <span>بازی</span>
@@ -419,27 +494,13 @@
     </div>
   </section>
 
-  <!-- Partners -->
-  <section class="section">
-    <div class="section-head">
-      <h2 class="section-title">پیوندها</h2>
-    </div>
-    <div class="partner-row">
-      <a href="https://ganjoor.net" target="_blank" rel="noopener" title="گنجور">
-        <img src="https://abrehamrahi.ir/o/public/z76J9KQP/" alt="گنجور"
-             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'min-height:70px\'>گنجور</div>';">
-      </a>
-      <a href="https://soleimani.ir/" target="_blank" rel="noopener" title="سلیمانی">
-        <img src="https://abrehamrahi.ir/o/public/60rLeJYB/" alt="سلیمانی"
-             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'min-height:70px\'>soleimani.ir</div>';">
-      </a>
-    </div>
-  </section>
+  
+
 
   <!-- Game banner -->
   <section class="section">
     <div class="banner-row">
-      <a href="http://khordadapp.blogfa.com/page/game" target="_blank" rel="noopener" title="بازی">
+      <a href="http://worldwariv.ir.m.ihweb.ir/bazi.html" target="_blank" rel="noopener" title="بازی">
         <img src="https://abrehamrahi.ir/o/public/0Xhe2HaS/" alt="بازی خرداد"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'min-height:80px\'>بخش بازی</div>';">
       </a>
@@ -449,99 +510,15 @@
   <!-- Wide banner -->
   <section class="section">
     <div class="banner-row">
-      <a href="https://khordadapp.blogfa.com/page/gapzehn" target="_blank" rel="noopener">
-        <img src="https://abrehamrahi.ir/o/public/R1JEYkIE/" alt="بنر خرداد"
-             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'min-height:70px\'>ویترین خرداد</div>';">
+      <div style="border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--card)">
+   
+
+
       </a>
     </div>
   </section>
 
-  <!-- Content grid - keep all 8 -->
-  <section class="section">
-    <div class="section-head">
-      <h2 class="section-title">محتوای برگزیده</h2>
-      <span class="section-sub">۸ پیشنهاد خواندنی و دیدنی</span>
-    </div>
-    <div class="content-grid">
-      <a class="content-card" href="http://khordadapp.blogfa.com/page/bar3" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://abrehamrahi.ir/o/public/ElnnZCp7/" alt="برترین فیلم‌ها"
-               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-ph\'>فیلم</div>';">
-        </div>
-        <div class="meta">برترین فیلم‌های تاریخ<small>لیست ماندگار سینما</small></div>
-      </a>
-      <a class="content-card" href="http://khordadapp.blogfa.com/page/bar1" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://abrehamrahi.ir/o/public/MQEJFgny/" alt="اپ‌های ایرانی"
-               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-ph\'>اپ</div>';">
-        </div>
-        <div class="meta">برترین اپلیکیشن‌های ایرانی<small>ابزارهای کاربردی</small></div>
-      </a>
-      <a class="content-card" href="https://khordadapp.blogfa.com/page/bar4" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://abrehamrahi.ir/o/public/v2jhYb4P/" alt="لپ‌تاپ لنوو"
-               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-ph\'>لپ‌تاپ</div>';">
-        </div>
-        <div class="meta">جدیدترین لپ‌تاپ لنوو<small>بررسی و معرفی</small></div>
-      </a>
-      <a class="content-card" href="https://khordadapp.blogfa.com/page/m4" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://abrehamrahi.ir/o/public/tGgUuAda/" alt="پایان نامتناهی"
-               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-ph\'>مقاله</div>';">
-        </div>
-        <div class="meta">پایان نامتناهی؟<small>نگاهی متفاوت</small></div>
-      </a>
-      <a class="content-card" href="https://khordadapp.blogfa.com/page/m5" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://abrehamrahi.ir/o/public/w8AdJZ7H/" alt="مهندسی ژنتیک"
-               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-ph\'>علم</div>';">
-        </div>
-        <div class="meta">دستاوردهای مهندسی ژنتیک<small>علم به زبان ساده</small></div>
-      </a>
-      <a class="content-card" href="http://khordadapp.blogfa.com/page/bar5" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://abrehamrahi.ir/o/public/G8XzOxBL/" alt="ایده‌های پولساز"
-               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-ph\'>کسب‌وکار</div>';">
-        </div>
-        <div class="meta">ایده‌های پولساز برای نوجوانان<small>شروع هوشمند</small></div>
-      </a>
-      <a class="content-card" href="https://khordadapp.blogfa.com/page/m2" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://abrehamrahi.ir/o/public/Zlux2zF0/" alt="ترفند گوشی"
-               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-ph\'>ترفند</div>';">
-        </div>
-        <div class="meta">ترفندهای گوشی که نمی‌دانستید<small>کاربردی و سریع</small></div>
-      </a>
-      <a class="content-card" href="https://khordadapp.blogfa.com/page/bar2" target="_blank" rel="noopener">
-        <div class="thumb">
-          <img src="https://abrehamrahi.ir/o/public/0TZejMv5/" alt="کتاب‌ها"
-               onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'img-ph\'>کتاب</div>';">
-        </div>
-        <div class="meta">محبوب‌ترین کتاب‌ها<small>پیشنهاد مطالعه</small></div>
-      </a>
-    </div>
-  </section>
 
-  <!-- Triple highlight -->
-  <section class="section">
-    <div class="section-head">
-      <h2 class="section-title">برجسته‌ها</h2>
-    </div>
-    <div class="triple">
-      <a href="https://khordadapp.blogfa.com/page/gapzehn" target="_blank" rel="noopener">
-        <img src="https://abrehamrahi.ir/o/public/xMqCfp01" alt="گفت‌وگو"
-             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'aspect-ratio:1\'>گفت‌وگو</div>';">
-      </a>
-      <a href="https://khordadapp.blogfa.com/page/ranking" target="_blank" rel="noopener">
-        <img src="https://abrehamrahi.ir/o/public/uX5Ga83S/" alt="رتبه"
-             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'aspect-ratio:1\'>رتبه</div>';">
-      </a>
-      <a href="http://khordadapp.blogfa.com/page/maghalat" target="_blank" rel="noopener">
-        <img src="https://abrehamrahi.ir/o/public/oJcHAGY0/" alt="مقاله"
-             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'aspect-ratio:1\'>مقاله</div>';">
-      </a>
-    </div>
-  </section>
 
   <!-- Services -->
   <section class="section" id="services">
@@ -555,27 +532,27 @@
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>📋</div>';">
         <span>نظرسنجی</span>
       </a>
-      <a class="service-card" href="http://khordadapp.blogfa.com/page/rules" target="_blank" rel="noopener">
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/ghavanin.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/GKAdu0m2/" alt="قوانین"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>📜</div>';">
         <span>قوانین</span>
       </a>
-      <a class="service-card" href="https://khordadapp.blogfa.com/page/smasl" target="_blank" rel="noopener">
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/salb.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/9KdSekxz/" alt="سوالات"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>❓</div>';">
         <span>سوالات متداول</span>
       </a>
-      <a class="service-card" href="http://khordadapp.blogfa.com/page/zrc" target="_blank" rel="noopener">
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/daryaft.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/VluyY8zZ/" alt="پشتیبانی"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>💬</div>';">
         <span>پشتیبانی</span>
       </a>
-      <a class="service-card" href="http://khordadapp.blogfa.com/page/rasmi" target="_blank" rel="noopener">
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/rasmi.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/LeazoOh3/" alt="رسمی"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>🏛️</div>';">
         <span>بخش رسمی</span>
       </a>
-      <a class="service-card" href="http://khordadapp.blogfa.com/page/proposal" target="_blank" rel="noopener">
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/ideh.html" target="_blank" rel="noopener">
         <img src="https://abrehamrahi.ir/o/public/e8gMHmwX/" alt="پیشنهاد"
              onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>💡</div>';">
         <span>پیشنهادات</span>
@@ -586,30 +563,79 @@
 </main>
 
 <footer>
-  <strong>اپلیکیشن خرداد</strong><br>
-  ویترین تحت وب — همه لینک‌ها در تب جدید باز می‌شوند
-  <div id="lastVisit" style="margin-top:8px;font-size:.72rem;opacity:.75"></div>
+  <div id="lastVisit" style="font-size:.72rem;opacity:.75"></div>
 </footer>
 
-<div class="toast" id="toast">به خرداد خوش آمدید 👋<br><small style="color:var(--muted)">نسخه تحت وب ویترین</small></div>
+<div class="toast" id="toast">به خرداد خوش آمدید 👋<br><small style="color:var(--muted)">نسل جدید ویترین خرداد</small></div>
 <button id="toTop" title="بالای صفحه" type="button">↑</button>
 
 <script>
 (function(){
-  // Welcome toast
-  var toast = document.getElementById('toast');
-  setTimeout(function(){ toast.classList.add('show'); }, 400);
-  setTimeout(function(){ toast.classList.remove('show'); }, 4500);
+  // ===== ذخیره و بازیابی روی دستگاه کاربر (localStorage) =====
+  function storeGet(key){
+    try{
+      if(window.localStorage) return window.localStorage.getItem(key);
+    }catch(e){}
+    return null;
+  }
+  function storeSet(key, val){
+    try{
+      if(window.localStorage){
+        window.localStorage.setItem(key, val);
+        return true;
+      }
+    }catch(e){}
+    return false;
+  }
 
-  // Back to top
+  // ===== حالت روز/شب (پیش‌فرض: روز) — ذخیره روی دستگاه =====
+  var THEME_KEY = 'khordad_theme';
+  var root = document.documentElement;
+  var themeBtn = document.getElementById('themeToggle');
+
+  function applyTheme(theme){
+    if(theme !== 'dark' && theme !== 'light') theme = 'light';
+    root.setAttribute('data-theme', theme);
+    if(themeBtn){
+      themeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+      themeBtn.title = theme === 'dark' ? 'حالت روز' : 'حالت شب';
+    }
+  }
+
+  // خواندن تم ذخیره‌شده از حافظه دستگاه؛ اگر نبود → روز
+  var savedTheme = storeGet(THEME_KEY);
+  applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
+
+  if(themeBtn){
+    themeBtn.addEventListener('click', function(){
+      var current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      var next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      storeSet(THEME_KEY, next); // ذخیره دائمی روی دستگاه کاربر
+    });
+  }
+
+  // ===== دیالوگ خوش‌آمدگویی فقط یک‌بار (ذخیره روی دستگاه) =====
+  var WELCOME_KEY = 'khordad_welcome_seen';
+  var toast = document.getElementById('toast');
+  var seen = storeGet(WELCOME_KEY) === '1';
+  if(!seen && toast){
+    setTimeout(function(){ toast.classList.add('show'); }, 400);
+    setTimeout(function(){ toast.classList.remove('show'); }, 4500);
+    storeSet(WELCOME_KEY, '1'); // بعد از نمایش دیگه نشون داده نشه
+  }
+
+  // ===== دکمه بازگشت به بالا =====
   var btn = document.getElementById('toTop');
   window.addEventListener('scroll', function(){
     if (window.scrollY > 400) btn.classList.add('show');
     else btn.classList.remove('show');
   });
-  btn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+  if(btn){
+    btn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+  }
 
-  // ریپل خاکستری شبیه اندروید روی همه لینک‌ها
+  // ===== ریپل خاکستری شبیه اندروید روی همه لینک‌ها =====
   function makeRipple(e){
     var el = e.currentTarget;
     if (!el.classList.contains('ripple-host')) el.classList.add('ripple-host');
@@ -630,23 +656,26 @@
     a.addEventListener('pointerdown', makeRipple, {passive:true});
   });
 
-  // نمایش بازدید قبلی + ثبت بازدید فعلی
-  try {
-    var prev = localStorage.getItem('khordad_vitrin_last');
-    var lv = document.getElementById('lastVisit');
-    if (prev && lv) lv.textContent = 'آخرین بازدید شما: ' + prev;
-    var now = new Date();
-    var label = now.toLocaleDateString('fa-IR') + ' — ' + now.toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
-    localStorage.setItem('khordad_vitrin_last', label);
-  } catch(e){}
+  // ===== نمایش بازدید قبلی + ثبت بازدید فعلی =====
+  var prev = storeGet('khordad_vitrin_last');
+  var lv = document.getElementById('lastVisit');
+  if (prev && lv) lv.textContent = 'آخرین بازدید شما: ' + prev;
+  var now = new Date();
+  var label = now.toLocaleDateString('fa-IR') + ' — ' + now.toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
+  storeSet('khordad_vitrin_last', label);
 
-  // لود نرم تصاویر (اگر دیر لود شدن محو ظاهر نشن)
+  // ===== لود نرم تصاویر =====
   document.querySelectorAll('img').forEach(function(img){
     if (img.complete) return;
     img.style.opacity = '0';
     img.style.transition = 'opacity .35s ease';
     img.addEventListener('load', function(){ img.style.opacity = '1'; });
     img.addEventListener('error', function(){ img.style.opacity = '1'; });
+  });
+
+  // جلوگیری از منوی راست‌کلیک روی تصاویر
+  document.addEventListener('contextmenu', function(e){
+    if(e.target && e.target.tagName === 'IMG') e.preventDefault();
   });
 })();
 </script>
