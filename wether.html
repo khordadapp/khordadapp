@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<style>
+body{
+background:  !important;
+background-image: url("https://abrehamrahi.ir/o/public/iWp4ayyS/") !important;
+}
+</style>
+
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title><-AutoPageTitle-></title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-language" content="fa">
+<meta name="description" content="<-BlogMetaDescription->">
+<meta name="generator" content="blogfa.com">
+<meta property="og:title" content="<-AutoPageTitle->">
+<meta property="og:site_name" content="<-BlogTitle->">
+<meta property="og:description" content="<-BlogMetaDescription->">
+<meta name="twitter:title" content="<-AutoPageTitle->">
+<meta name="twitter:description" content="<-BlogMetaDescription->">
+<link rel="alternate" type="application/rss+xml" title="<-BlogTitle->" href="<-BlogXmlLink->" />
+<link href="http://template.pichak.net/pichak/233/style.css" type="text/css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script type="text/JavaScript" src="http://theme.blogfa.com/public/curvycorners.js"></script>
+  <script type="text/JavaScript" src="http://theme.blogfa.com/ocean/ie-fix.js"></script>
+<![endif]-->
+
+<script src="http://theme.blogfa.com/public/theme.js"  type="text/javascript" ></script>
+
+<script type="text/javascript">
+ try {
+  cmt_caption[0]="نظرات";
+  cmt_caption[1]="نظر بدهيد";
+  cmt_caption[2]="يک نظر";
+  cmt_caption[3]="نظر";
+  cmt_tagname="comment_" ;
+  cmt_blogid="<-BlogId->";
+  }
+  catch(e) {}
+ 
+</script>
+
+</head>
+
+<body>
+<div id="wrapper">
+
+<div id="headerbox">
+<div id="header">
+
+        
+</div>        
+</div>
+<!-- end header -->
+
+<div id="container">
+<div id="content">
+<div id="contentin">
+
+
+<div class="postcontent">
+<!--مکان پیش فرض محتوا-->
+
+<center>
+<script type="text/javascript" src="http://1abzaar.ir/abzar/tools/no-selects.js"></script><div style="display:none"><h2><a rel="nofollow" href="http://www.1abzar.com" >&#1575;&#1576;&#1586;&#1575;&#1585; &#1608;&#1576;&#1605;&#1587;&#1578;&#1585;</a></h2></div>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نمایش آب و هوای شهرهای ایران</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #weather-info {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>مشاهده لحظه‌ای آب‌و‌هوا</h1>
+    <div class="meta-info">ساخته شده توسط تیم خرداد</div>
+        <input type="text" id="city" placeholder="نام شهر (مثل تهران)">
+        <button onclick="getWeather()">نمایش آب و هوا</button>
+        <div id="weather-info"></div>
+    </div>
+
+    <script>
+        const apiKey = "e11998d0169627a85ff216bc584165c0"; // کلید API خودت رو از OpenWeatherMap اینجا بذار
+        const weatherInfo = document.getElementById("weather-info");
+
+        function getWeather() {
+            const city = document.getElementById("city").value;
+            if (!city) {
+                weatherInfo.innerHTML = "لطفاً نام شهر را وارد کنید!";
+                return;
+            }
+
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},IR&appid=${apiKey}&units=metric&lang=fa`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cod === 200) {
+                        const temp = data.main.temp;
+                        const description = data.weather[0].description;
+                        const cityName = data.name;
+                        weatherInfo.innerHTML = `
+                            <p>شهر: ${cityName}</p>
+                            <p>دما: ${temp}°C</p>
+                            <p>وضعیت: ${description}</p>
+                        `;
+                    } else {
+                        weatherInfo.innerHTML = "شهر یافت نشد! لطفاً نام شهر را درست وارد کنید.";
+                    }
+                })
+                .catch(error => {
+                    weatherInfo.innerHTML = "خطایی رخ داد. لطفاً دوباره تلاش کنید.";
+                    console.error(error);
+                });
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+<u>    </u><br/>
+
+
+
+ <div class="clear"></div>
+</div>
+<!-- end postcontent --> 
+
+
+
+
+</div>
+<!-- end postbody -->
+
+</div>
+<!-- end post -->
+
+
+
+
+
+
+</div>
+<!-- end contentin -->
+
+
+</div>
+<!-- end content -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+
+ <div class="copyright">
+                    
+
+
+</div><!-- end sidebarin -->
+</div>
+<!-- end sidebar -->
+
+<div class="clear"></div>
+
+</div>
+<!-- end container -->
+
+</div>
+<!-- end wrapper -->
+
+
+</body>
+
+</html>

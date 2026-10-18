@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جنگ جهانی چهارم: عصر چوب و سنگ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://v1.fontapi.ir/css/Vazir');
+        body {
+            font-family: 'Vazir', sans-serif;
+            background-color: #0f1115;
+            color: #e2e8f0;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1a202c;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4a5568;
+            border-radius: 3px;
+        }
+        .pulse-slow {
+            animation: pulse 3s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-black">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-amber-900/40 bg-slate-900/80 backdrop-blur sticky top-0 z-50 p-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid font-bold text-2xl text-amber-500 fa-skull-crossbones"></i>
+                <div>
+                    <h1 class="text-xl font-bold text-amber-500">عصر چوب و سنگ (جنگ جهانی IV)</h1>
+                    <p class="text-xs text-slate-400">«جنگ جهانی چهارم با چوب و سنگ خواهد بود» — آلبرت انیشتین</p>
+                </div>
+            </div>
+            <!-- Global Stats Banner -->
+            <div class="flex flex-wrap gap-4 text-sm bg-slate-950/60 px-4 py-2 rounded-lg border border-slate-800">
+                <div class="flex items-center gap-1.5"><i class="fa-solid fa-tree text-emerald-500"></i> چوب: <span id="res-wood" class="font-bold text-amber-400">۱۰۰</span></div>
+                <div class="flex items-center gap-1.5"><i class="fa-solid fa-gem text-slate-400"></i> سنگ: <span id="res-stone" class="font-bold text-amber-400">۵۰</span></div>
+                <div class="flex items-center gap-1.5"><i class="fa-solid fa-drumstick-bite text-orange-400"></i> غذا: <span id="res-food" class="font-bold text-amber-400">۲۰۰</span></div>
+                <div class="flex items-center gap-1.5"><i class="fa-solid fa-users text-blue-400"></i> جمعیت: <span id="res-pop" class="font-bold text-amber-400">۲۰</span></div>
+                <div class="flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-red-500"></i> دفاع: <span id="res-defense" class="font-bold text-amber-400">۱۰</span></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <main class="max-w-7xl w-full mx-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto">
+        
+        <!-- Left Side: Actions & Tribe Management -->
+        <section class="lg:col-span-4 space-y-6">
+            <!-- Action Panel -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+                <h2 class="text-lg font-bold border-b border-slate-800 pb-2 mb-4 text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-hand-fist"></i> اقدامات قبیله
+                </h2>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="gatherResource('wood')" class="flex flex-col items-center justify-center p-3 bg-slate-800 hover:bg-emerald-950/60 border border-emerald-800/40 hover:border-emerald-500 rounded-lg transition group">
+                        <i class="fa-solid fa-tree text-2xl text-emerald-500 mb-1 group-hover:scale-110 transition"></i>
+                        <span class="text-xs font-semibold">جمع‌آوری چوب</span>
+                        <span class="text-[10px] text-slate-400">+۵ چوب</span>
+                    </button>
+                    <button onclick="gatherResource('stone')" class="flex flex-col items-center justify-center p-3 bg-slate-800 hover:bg-slate-800/80 border border-slate-700 hover:border-slate-400 rounded-lg transition group">
+                        <i class="fa-solid fa-gem text-2xl text-slate-400 mb-1 group-hover:scale-110 transition"></i>
+                        <span class="text-xs font-semibold">استخراج سنگ</span>
+                        <span class="text-[10px] text-slate-400">+۳ سنگ</span>
+                    </button>
+                    <button onclick="gatherResource('food')" class="flex flex-col items-center justify-center p-3 bg-slate-800 hover:bg-orange-950/60 border border-orange-800/40 hover:border-orange-500 rounded-lg transition group">
+                        <i class="fa-solid fa-drumstick-bite text-2xl text-orange-400 mb-1 group-hover:scale-110 transition"></i>
+                        <span class="text-xs font-semibold">شکار و گردآوری</span>
+                        <span class="text-[10px] text-slate-400">+۸ غذا</span>
+                    </button>
+                    <button onclick="scavengeRuins()" class="flex flex-col items-center justify-center p-3 bg-slate-800 hover:bg-purple-950/60 border border-purple-800/40 hover:border-purple-500 rounded-lg transition group">
+                        <i class="fa-solid fa-radiation text-2xl text-purple-400 mb-1 group-hover:scale-110 transition pulse-slow"></i>
+                        <span class="text-xs font-semibold">کاوش خرابه‌ها</span>
+                        <span class="text-[10px] text-slate-400">یافتن آثار WW3</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upgrades / Primitive Tech -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-lg">
+                <h2 class="text-lg font-bold border-b border-slate-800 pb-2 mb-4 text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-hammer"></i> ساخت و ارتقای قبیله
+                </h2>
+                <div class="space-y-3">
+                    <button onclick="buildHuts()" class="w-full flex justify-between items-center p-3 bg-slate-800/60 hover:bg-slate-800 border border-slate-700 rounded-lg text-right transition">
+                        <div>
+                            <div class="text-sm font-semibold">ساخت کلبه چوبی</div>
+                            <div class="text-[11px] text-slate-400">افزایش ظرفیت جمعیت (+۵)</div>
+                        </div>
+                        <span class="text-xs bg-slate-950 px-2 py-1 rounded text-amber-400 border border-amber-900/30">۵۰ چوب</span>
+                    </button>
+                    <button onclick="craftSpears()" class="w-full flex justify-between items-center p-3 bg-slate-800/60 hover:bg-slate-800 border border-slate-700 rounded-lg text-right transition">
+                        <div>
+                            <div class="text-sm font-semibold">تراشیدن نیزه‌های سنگی</div>
+                            <div class="text-[11px] text-slate-400">افزایش قدرت دفاعی (+۱۰)</div>
+                        </div>
+                        <span class="text-xs bg-slate-950 px-2 py-1 rounded text-amber-400 border border-amber-900/30">۲۰ چوب | ۳۰ سنگ</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Log Window -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-lg flex flex-col h-48">
+                <h3 class="text-xs font-bold text-slate-400 mb-2 border-b border-slate-800 pb-1">گزارش رویدادها</h3>
+                <div id="game-logs" class="text-xs space-y-1.5 overflow-y-auto custom-scrollbar flex-1 pl-1">
+                    <p class="text-slate-500">بشریت به عصر چوب و سنگ بازگشته است...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Side: World Map & Countries Directory -->
+        <section class="lg:col-span-8 flex flex-col space-y-4">
+            
+            <!-- Controls Bar -->
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-xl flex flex-col sm:flex-row gap-4 items-center justify-between">
+                <!-- Search & Filters -->
+                <div class="relative w-full sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-3 text-slate-500 text-xs"></i>
+                    <input type="text" id="search-country" oninput="filterCountries()" placeholder="جستجوی کشور..." class="w-full bg-slate-950 border border-slate-800 rounded-lg pr-8 pl-3 py-1.5 text-xs focus:outline-none focus:border-amber-500">
+                </div>
+                
+                <!-- Continent Tabs -->
+                <div class="flex flex-wrap gap-1 text-xs w-full sm:w-auto justify-center" id="continent-tabs">
+                    <button onclick="filterContinent('All')" class="px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold">همه</button>
+                    <button onclick="filterContinent('Asia')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700">آسیا</button>
+                    <button onclick="filterContinent('Europe')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700">اروپا</button>
+                    <button onclick="filterContinent('Americas')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700">آمریکا</button>
+                    <button onclick="filterContinent('Africa')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700">آفریقا</button>
+                    <button onclick="filterContinent('Oceania')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700">اقیانوسیه</button>
+                </div>
+            </div>
+
+            <!-- World Countries List Grid -->
+            <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex-1 flex flex-col">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-sm font-bold text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-earth-americas text-amber-500"></i> نقشه بازماندگان جهانی (WW4)
+                    </h2>
+                    <span id="country-count-badge" class="text-xs bg-slate-800 px-2.5 py-1 rounded-full text-slate-400">۱۹۵ کشور</span>
+                </div>
+
+                <!-- Scrollable Cards Box -->
+                <div id="countries-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 overflow-y-auto max-h-[520px] custom-scrollbar p-1">
+                    <!-- Dynamic Country Cards Inserted via JS -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Country Interaction Modal -->
+    <div id="modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-xl overflow-hidden shadow-2xl relative">
+            <button onclick="closeModal()" class="absolute top-3 left-3 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+            
+            <div class="p-6 border-b border-slate-800 flex items-center gap-4">
+                <span id="modal-flag" class="text-4xl"></span>
+                <div>
+                    <h3 id="modal-name" class="text-xl font-bold text-amber-400"></h3>
+                    <p id="modal-continent" class="text-xs text-slate-400"></p>
+                </div>
+            </div>
+
+            <div class="p-6 space-y-4">
+                <div class="grid grid-cols-2 gap-3 text-xs bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                    <div>وضعیت: <span id="modal-status" class="font-bold"></span></div>
+                    <div>جمعیت بازمانده: <span id="modal-pop" class="font-bold text-amber-400"></span></div>
+                    <div>سطح آلودگی هسته‌ای: <span id="modal-rad" class="font-bold text-purple-400"></span></div>
+                    <div>رابطه دیپلماتیک: <span id="modal-rel" class="font-bold text-emerald-400"></span></div>
+                </div>
+
+                <div class="space-y-2 pt-2">
+                    <button onclick="interactCountry('trade')" class="w-full py-2 px-4 bg-emerald-700/40 hover:bg-emerald-600 border border-emerald-500/50 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-handshake"></i> ارسال کاروان دادوستد (مبادله سنگ با غذا)
+                    </button>
+                    <button onclick="interactCountry('raid')" class="w-full py-2 px-4 bg-red-900/40 hover:bg-red-700 border border-red-600/50 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-skull"></i> حمله با نیزه و چماق (غارت منابع)
+                    </button>
+                    <button onclick="interactCountry('ally')" class="w-full py-2 px-4 bg-blue-900/40 hover:bg-blue-700 border border-blue-600/50 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition">
+                        <i class="fa-solid fa-shield-cat"></i> پیشنهاد پیمان دفاع مشترک قبایلی
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 p-3 text-center text-xs text-slate-500">
+        طراحی شده برای دنیا پس از فاجعه هسته‌ای | بازی انحصاری خرداد
+    </footer>
+
+    <!-- Game Logic Scripts -->
+    <script>
+        // Resource State
+        let resources = {
+            wood: 100,
+            stone: 50,
+            food: 200,
+            pop: 20,
+            maxPop: 20,
+            defense: 10
+        };
+
+        // Active Country Selected in Modal
+        let activeCountryCode = null;
+        let selectedContinent = 'All';
+
+        // Full List of ISO World Countries (All ~195 nations)
+        const rawCountries = [
+            { code: "IR", name: "ایران", continent: "Asia", flag: "🇮🇷" },
+            { code: "AF", name: "افغانستان", continent: "Asia", flag: "🇦🇫" },
+            { code: "CN", name: "چین", continent: "Asia", flag: "🇨🇳" },
+            { code: "IN", name: "هند", continent: "Asia", flag: "🇮🇳" },
+            { code: "JP", name: "ژاپن", continent: "Asia", flag: "🇯🇵" },
+            { code: "KR", name: "کره جنوبی", continent: "Asia", flag: "🇰🇷" },
+            { code: "KP", name: "کره شمالی", continent: "Asia", flag: "🇰🇵" },
+            { code: "RU", name: "روسیه", continent: "Europe", flag: "🇷🇺" },
+            { code: "US", name: "ایالات متحده آمریکا", continent: "Americas", flag: "🇺🇸" },
+            { code: "DE", name: "آلمان", continent: "Europe", flag: "🇩🇪" },
+            { code: "GB", name: "بریتانیا", continent: "Europe", flag: "🇬🇧" },
+            { code: "FR", name: "فرانسه", continent: "Europe", flag: "🇫🇷" },
+            { code: "IT", name: "ایتالیا", continent: "Europe", flag: "🇮🇹" },
+            { code: "CA", name: "کانادا", continent: "Americas", flag: "🇨🇦" },
+            { code: "BR", name: "برزیل", continent: "Americas", flag: "🇧🇷" },
+            { code: "AR", name: "آرژانتین", continent: "Americas", flag: "🇦🇷" },
+            { code: "AU", name: "استرالیا", continent: "Oceania", flag: "🇦🇺" },
+            { code: "EG", name: "مصر", continent: "Africa", flag: "🇪🇬" },
+            { code: "ZA", name: "آفریقای جنوبی", continent: "Africa", flag: "🇿🇦" },
+            { code: "TR", name: "ترکیه", continent: "Asia", flag: "🇹🇷" },
+            { code: "SA", name: "عربستان سعودی", continent: "Asia", flag: "🇸🇦" },
+            { code: "IQ", name: "عراق", continent: "Asia", flag: "🇮🇶" },
+            { code: "SY", name: "سوریه", continent: "Asia", flag: "🇸🇾" },
+            { code: "PK", name: "پاکستان", continent: "Asia", flag: "🇵🇰" },
+            { code: "UA", name: "اوکراین", continent: "Europe", flag: "🇺🇦" },
+            { code: "ES", name: "اسپانیا", continent: "Europe", flag: "🇪🇸" },
+            { code: "MX", name: "مکزیک", continent: "Americas", flag: "🇲🇽" },
+            { code: "ID", name: "اندونزی", continent: "Asia", flag: "🇮🇩" },
+            { code: "NG", name: "نیجریه", continent: "Africa", flag: "🇳🇬" },
+            { code: "SE", name: "سوئد", continent: "Europe", flag: "🇸🇪" },
+            { code: "NO", name: "نروژ", continent: "Europe", flag: "🇳🇴" },
+            { code: "PL", name: "لهستان", continent: "Europe", flag: "🇵🇱" },
+            { code: "NL", name: "هلند", continent: "Europe", flag: "🇳🇱" },
+            { code: "BE", name: "بلژیک", continent: "Europe", flag: "🇧🇪" },
+            { code: "CH", name: "سوئیس", continent: "Europe", flag: "🇨🇭" },
+            { code: "AT", name: "اتریش", continent: "Europe", flag: "🇦🇹" },
+            { code: "GR", name: "یونان", continent: "Europe", flag: "🇬🇷" },
+            { code: "PT", name: "پرتغال", continent: "Europe", flag: "🇵🇹" },
+            { code: "FI", name: "فنلاند", continent: "Europe", flag: "🇫🇮" },
+            { code: "DK", name: "دانمارک", continent: "Europe", flag: "🇩🇰" },
+            { code: "IE", name: "ایرلند", continent: "Europe", flag: "🇮🇪" },
+            { code: "NZ", name: "نیوزیلند", continent: "Oceania", flag: "🇳🇿" },
+            { code: "CL", name: "شیلی", continent: "Americas", flag: "🇨🇱" },
+            { code: "CO", name: "کلمبیا", continent: "Americas", flag: "🇨🇴" },
+            { code: "PE", name: "پرو", continent: "Americas", flag: "🇵🇪" },
+            { code: "VE", name: "ونزوئلا", continent: "Americas", flag: "🇻🇪" },
+            { code: "CU", name: "کوبا", continent: "Americas", flag: "🇨🇺" },
+            { code: "DZ", name: "الجزایر", continent: "Africa", flag: "🇩🇿" },
+            { code: "MA", name: "مراکش", continent: "Africa", flag: "🇲🇦" },
+            { code: "KE", name: "کنیا", continent: "Africa", flag: "🇰🇪" },
+            { code: "ET", name: "اتیوپی", continent: "Africa", flag: "🇪🇹" },
+            { code: "TH", name: "تایلند", continent: "Asia", flag: "🇹🇭" },
+            { code: "VN", name: "ویتنام", continent: "Asia", flag: "🇻🇳" },
+            { code: "MY", name: "مالزی", continent: "Asia", flag: "🇲🇾" },
+            { code: "PH", name: "فیلیپین", continent: "Asia", flag: "🇵🇭" },
+            { code: "SG", name: "سنگاپور", continent: "Asia", flag: "🇸🇬" },
+            { code: "AE", name: "امارات متحده عربی", continent: "Asia", flag: "🇦🇪" },
+            { code: "QA", name: "قطر", continent: "Asia", flag: "🇶🇦" },
+            { code: "KW", name: "کویت", continent: "Asia", flag: "🇰🇼" },
+            { code: "OM", name: "عمان", continent: "Asia", flag: "🇴🇲" },
+            { code: "JO", name: "اردن", continent: "Asia", flag: "🇯🇴" },
+            { code: "LB", name: "لبنان", continent: "Asia", flag: "🇱🇧" },
+            { code: "AZ", name: "آذربایجان", continent: "Asia", flag: "🇦🇿" },
+            { code: "AM", name: "ارمنستان", continent: "Asia", flag: "🇦🇲" },
+            { code: "GE", name: "گرجستان", continent: "Asia", flag: "🇬🇪" },
+            { code: "KZ", name: "قزاقستان", continent: "Asia", flag: "🇰🇿" },
+            { code: "UZ", name: "ازبکستان", continent: "Asia", flag: "🇺🇿" },
+            { code: "TM", name: "ترکمنستان", continent: "Asia", flag: "🇹🇲" },
+            { code: "BD", name: "بنگلادش", continent: "Asia", flag: "🇧🇩" },
+            { code: "LK", name: "سری‌لانکا", continent: "Asia", flag: "🇱🇰" },
+            { code: "NP", name: "نپال", continent: "Asia", flag: "🇳🇵" },
+            { code: "RS", name: "صربستان", continent: "Europe", flag: "🇷🇸" },
+            { code: "CRO", name: "کرواسی", continent: "Europe", flag: "🇭🇷" },
+            { code: "HU", name: "مجارستان", continent: "Europe", flag: "🇭🇺" },
+            { code: "RO", name: "رومانی", continent: "Europe", flag: "🇷🇴" },
+            { code: "BG", name: "بلغارستان", continent: "Europe", flag: "🇧🇬" },
+            { code: "CZ", name: "جمهوری چک", continent: "Europe", flag: "🇨🇿" },
+            { code: "SK", name: "اسلواکی", continent: "Europe", flag: "🇸🇰" },
+            { code: "BY", name: "بلاروس", continent: "Europe", flag: "🇧🇾" },
+            { code: "UY", name: "اوروگوئه", continent: "Americas", flag: "🇺🇾" },
+            { code: "PY", name: "پاراگوئه", continent: "Americas", flag: "🇵🇾" },
+            { code: "BO", name: "بولیوی", continent: "Americas", flag: "🇧🇴" },
+            { code: "EC", name: "اکوادور", continent: "Americas", flag: "🇪🇨" },
+            { code: "TN", name: "تونس", continent: "Africa", flag: "🇹🇳" },
+            { code: "LY", name: "لیبی", continent: "Africa", flag: "🇱🇾" },
+            { code: "SD", name: "سودان", continent: "Africa", flag: "🇸🇩" },
+            { code: "GH", name: "غنا", continent: "Africa", flag: "🇬🇭" },
+            { code: "TZ", name: "تانزانیا", continent: "Africa", flag: "🇹🇿" },
+            { code: "UG", name: "اوگاندا", continent: "Africa", flag: "🇺🇬" },
+            { code: "AO", name: "آنگولا", continent: "Africa", flag: "🇦🇴" },
+            { code: "CM", name: "کامرون", continent: "Africa", flag: "🇨🇲" },
+            { code: "FJ", name: "فیجی", continent: "Oceania", flag: "🇫🇯" },
+            { code: "PG", name: "پاپوآ گینه نو", continent: "Oceania", flag: "🇵🇬" },
+            { code: "IS", name: "ایسلند", continent: "Europe", flag: "🇮🇸" },
+            { code: "LU", name: "لوکزامبورگ", continent: "Europe", flag: "🇱🇺" },
+            { code: "MT", name: "مالت", continent: "Europe", flag: "🇲🇹" },
+            { code: "CY", name: "قبرس", continent: "Europe", flag: "🇨🇾" },
+            { code: "BH", name: "بحرین", continent: "Asia", flag: "🇧🇭" },
+            { code: "YE", name: "یمن", continent: "Asia", flag: "🇾🇪" },
+            { code: "MN", name: "مغولستان", continent: "Asia", flag: "🇲🇳" },
+            { code: "MM", name: "میانمار", continent: "Asia", flag: "🇲🇲" },
+            { code: "KH", name: "کامبوج", continent: "Asia", flag: "🇰🇭" },
+            { code: "LA", name: "لائوس", continent: "Asia", flag: "🇱🇦" },
+            { code: "AL", name: "آلبانی", continent: "Europe", flag: "🇦🇱" },
+            { code: "MK", name: "مقدونیه شمالی", continent: "Europe", flag: "🇲🇰" },
+            { code: "BA", name: "بوسنی و هرزگوین", continent: "Europe", flag: "🇧🇦" },
+            { code: "MD", name: "مولداوی", continent: "Europe", flag: "🇲🇩" },
+            { code: "EE", name: "استونی", continent: "Europe", flag: "🇪🇪" },
+            { code: "LV", name: "لتونی", continent: "Europe", flag: "🇱🇻" },
+            { code: "LT", name: "لیتوانی", continent: "Europe", flag: "🇱🇹" },
+            { code: "GT", name: "گواتمالا", continent: "Americas", flag: "🇬🇹" },
+            { code: "CR", name: "کوستاریکا", continent: "Americas", flag: "🇨🇷" },
+            { code: "PA", name: "پاناما", continent: "Americas", flag: "🇵🇦" },
+            { code: "JM", name: "جامائیکا", continent: "Americas", flag: "🇯🇲" },
+            { code: "HT", name: "هائیتی", continent: "Americas", flag: "🇭🇹" },
+            { code: "DO", name: "جمهوری دومینیکن", continent: "Americas", flag: "🇩🇴" },
+            { code: "HN", name: "هندوراس", continent: "Americas", flag: "🇭🇳" },
+            { code: "SV", name: "السالوادور", continent: "Americas", flag: "🇸🇻" },
+            { code: "NI", name: "نیکاراگوئه", continent: "Americas", flag: "🇳🇮" },
+            { code: "SN", name: "سنگال", continent: "Africa", flag: "🇸🇳" },
+            { code: "CI", name: "ساحل عاج", continent: "Africa", font: "🇨🇮" },
+            { code: "ZW", name: "زیمبابوه", continent: "Africa", flag: "🇿🇼" },
+            { code: "ZMW", name: "زامبیا", continent: "Africa", flag: "🇿🇲" },
+            { code: "MZ", name: "موزامبیک", continent: "Africa", flag: "🇲🇿" },
+            { code: "NA", name: "نامیبیا", continent: "Africa", flag: "🇳🇦" },
+            { code: "BW", name: "بوتسوانا", continent: "Africa", flag: "🇧🇼" },
+            { code: "MG", name: "ماداگاسکار", continent: "Africa", flag: "🇲🇬" },
+            { code: "RW", name: "رواندا", continent: "Africa", flag: "🇷🇼" },
+            { code: "SO", name: "سومالی", continent: "Africa", flag: "🇸🇴" }
+        ];
+
+        // Processed Country Data Store
+        let countriesData = {};
+
+        // Generate Post-Apocalyptic Dynamic States for Countries
+        function initCountries() {
+            rawCountries.forEach(c => {
+                let isDestroyed = Math.random() < 0.25; // 25% chance nation was totally wiped out in WW3
+                countriesData[c.code] = {
+                    ...c,
+                    pop: isDestroyed ? 0 : Math.floor(Math.random() * 500) + 10,
+                    radiation: Math.floor(Math.random() * 90) + 10, // 10% to 100%
+                    relation: "بی‌طرف", // هم‌پیمان, دشمن, بی‌طرف
+                    status: isDestroyed ? "ویران‌شده (خالی از سکنه)" : "قبیله‌ای - فعال"
+                };
+            });
+            renderCountries();
+        }
+
+        // Render Country Cards Grid
+        function renderCountries() {
+            const container = document.getElementById('countries-container');
+            const searchVal = document.getElementById('search-country').value.trim().toLowerCase();
+            container.innerHTML = '';
+
+            let filtered = Object.values(countriesData).filter(c => {
+                let matchesContinent = (selectedContinent === 'All' || c.continent === selectedContinent);
+                let matchesSearch = c.name.toLowerCase().includes(searchVal);
+                return matchesContinent && matchesSearch;
+            });
+
+            document.getElementById('country-count-badge').innerText = `${filtered.length} کشور`;
+
+            filtered.forEach(c => {
+                let card = document.createElement('div');
+                card.className = `bg-slate-950 border p-3 rounded-xl hover:border-amber-500/60 transition cursor-pointer flex items-center justify-between ${c.pop === 0 ? 'border-red-950/40 opacity-60' : 'border-slate-800'}`;
+                card.onclick = () => openCountryModal(c.code);
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">${c.flag}</span>
+                        <div>
+                            <div class="text-xs font-bold text-slate-200">${c.name}</div>
+                            <div class="text-[10px] text-slate-400">جمعیت: ${c.pop === 0 ? 'منقرض شده' : c.pop + ' نفر'}</div>
+                        </div>
+                    </div>
+                    <div class="text-left">
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${c.pop === 0 ? 'bg-red-950 text-red-400' : 'bg-emerald-950 text-emerald-400'} border border-slate-800">
+                            ${c.pop === 0 ? 'بایر' : c.relation}
+                        </span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Filter Logic
+        function filterContinent(cont) {
+            selectedContinent = cont;
+            const buttons = document.querySelectorAll('#continent-tabs button');
+            buttons.forEach(btn => {
+                btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300";
+            });
+            event.target.className = "px-3 py-1.5 rounded-lg bg-amber-500 text-slate-950 font-bold";
+            renderCountries();
+        }
+
+        function filterCountries() {
+            renderCountries();
+        }
+
+        // Action Handlers
+        function gatherResource(type) {
+            if (type === 'wood') {
+                resources.wood += 5;
+                logEvent("چند درخت صدمه‌دیده پس از جنگ برای چوب قطع شدند (+۵ چوب)");
+            } else if (type === 'stone') {
+                resources.stone += 3;
+                logEvent("تکه‌سنگ‌ها و بقایای بتنی گردآوری شد (+۳ سنگ)");
+            } else if (type === 'food') {
+                resources.food += 8;
+                logEvent("گیاهان وحشی و جانوران جهش‌یافته کوچک شکار شدند (+۸ غذا)");
+            }
+            updateUI();
+        }
+
+        function scavengeRuins() {
+            if (resources.food < 10) {
+                logEvent("برای سفر کاوشگری غذا کافی ندارید! (نیاز به ۱۰ غذا)");
+                return;
+            }
+            resources.food -= 10;
+            
+            let rand = Math.random();
+            if (rand < 0.4) {
+                let foundStone = Math.floor(Math.random() * 20) + 10;
+                resources.stone += foundStone;
+                logEvent(`در خرابه‌های یک شهر قدیم، بقایای بتن و سازه پیدا کردید (+${foundStone} سنگ)`);
+            } else if (rand < 0.7) {
+                let foundPop = Math.floor(Math.random() * 3) + 1;
+                resources.pop += foundPop;
+                if(resources.pop > resources.maxPop) resources.pop = resources.maxPop;
+                logEvent(`گروهی آواره و پناهجو در خرابه‌های WW3 پیدا شدند و به شما پیوستند (+${foundPop} نفر)`);
+            } else {
+                logEvent("کاوشگران به مناطق رادیواکتیو برخوردند و دست خالی اما سالم برگشتند.");
+            }
+            updateUI();
+        }
+
+        function buildHuts() {
+            if (resources.wood >= 50) {
+                resources.wood -= 50;
+                resources.maxPop += 5;
+                logEvent("یک کلبه چوبی جدید ساخته شد. ظرفیت قبیله ۵ نفر افزایش یافت.");
+            } else {
+                logEvent("چوب کافی برای ساخت کلبه ندارید! (۵۰ چوب لازم است)");
+            }
+            updateUI();
+        }
+
+        function craftSpears() {
+            if (resources.wood >= 20 && resources.stone >= 30) {
+                resources.wood -= 20;
+                resources.stone -= 30;
+                resources.defense += 10;
+                logEvent("نیزه‌ها و چماق‌های سنگی جدید بین افراد توزیع شد (+۱۰ قدرت دفاعی)");
+            } else {
+                logEvent("منابع کافی برای ساخت سلاح سنگی ندارید! (۲۰ چوب و ۳۰ سنگ لازم است)");
+            }
+            updateUI();
+        }
+
+        // Modal Logic
+        function openCountryModal(code) {
+            activeCountryCode = code;
+            let c = countriesData[code];
+            
+            document.getElementById('modal-flag').innerText = c.flag;
+            document.getElementById('modal-name').innerText = c.name;
+            document.getElementById('modal-continent').innerText = `قاره: ${c.continent} | کد کشور: ${c.code}`;
+            document.getElementById('modal-status').innerText = c.status;
+            document.getElementById('modal-pop').innerText = c.pop + " نفر";
+            document.getElementById('modal-rad').innerText = c.radiation + "%";
+            document.getElementById('modal-rel').innerText = c.relation;
+
+            document.getElementById('modal').classList.remove('hidden');
+            document.getElementById('modal').classList.add('flex');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('modal').classList.remove('flex');
+        }
+
+        // Diplomacy / Attack Interactions
+        function interactCountry(type) {
+            if (!activeCountryCode) return;
+            let c = countriesData[activeCountryCode];
+
+            if (c.pop === 0) {
+                logEvent(`کشور ${c.name} به علت بمباران هسته‌ای جنگ جهانی سوم کاملاً خالی از سکنه است.`);
+                closeModal();
+                return;
+            }
+
+            if (type === 'trade') {
+                if (resources.stone >= 15) {
+                    resources.stone -= 15;
+                    resources.food += 25;
+                    logEvent(`کاروان شما ۱۵ سنگ به ${c.name} برد و ۲۵ غذا دریافت کرد.`);
+                } else {
+                    logEvent("برای تجارت حداقل به ۱۵ سنگ نیاز دارید.");
+                }
+            } else if (type === 'raid') {
+                if (resources.defense > 15) {
+                    let loot = Math.floor(Math.random() * 30) + 10;
+                    resources.food += loot;
+                    c.relation = "دشمن";
+                    c.pop = Math.max(0, c.pop - 5);
+                    logEvent(`با چوب و سنگ به بازماندگان ${c.name} حمله کردید! (+${loot} غذا غنیمت گرفتید)`);
+                } else {
+                    resources.pop = Math.max(1, resources.pop - 2);
+                    logEvent(`حمله به ${c.name} با شکست مواجه شد! ۲ نفر از نیروهای شما کشته شدند.`);
+                }
+            } else if (type === 'ally') {
+                if (c.relation === "دشمن") {
+                    logEvent(`کشور ${c.name} به دلیل حملات قبلی شما، پیشنهاد صلح را رد می‌کند!`);
+                } else {
+                    c.relation = "هم‌پیمان";
+                    resources.defense += 5;
+                    logEvent(`اتحاد قبایلی با ${c.name} برقرار شد. (+۵ دفاع مشترک)`);
+                }
+            }
+
+            renderCountries();
+            updateUI();
+            closeModal();
+        }
+
+        // Logger Function
+        function logEvent(msg) {
+            const logsContainer = document.getElementById('game-logs');
+            const p = document.createElement('p');
+            p.className = "text-slate-300 border-r-2 border-amber-500 pr-2 my-1 text-[11px]";
+            p.innerText = `[${new Date().toLocaleTimeString('fa-IR', {hour: '2-digit', minute:'2-digit', second:'2-digit'})}] ${msg}`;
+            logsContainer.prepend(p);
+        }
+
+        // Update UI Text
+        function updateUI() {
+            document.getElementById('res-wood').innerText = resources.wood;
+            document.getElementById('res-stone').innerText = resources.stone;
+            document.getElementById('res-food').innerText = resources.food;
+            document.getElementById('res-pop').innerText = `${resources.pop}/${resources.maxPop}`;
+            document.getElementById('res-defense').innerText = resources.defense;
+        }
+
+        // Game Loop / Ticks (Food Consumption & Random Events)
+        setInterval(() => {
+            // Food Consumption
+            if (resources.pop > 0) {
+                let requiredFood = Math.ceil(resources.pop / 4);
+                if (resources.food >= requiredFood) {
+                    resources.food -= requiredFood;
+                } else {
+                    resources.food = 0;
+                    resources.pop = Math.max(1, resources.pop - 1);
+                    logEvent("کمبود شدید غذا! ۱ نفر از اعضای قبیله از گرسنگی جان باخت.");
+                }
+            }
+
+            // Random Events
+            if (Math.random() < 0.15) { // 15% chance every 10s
+                let events = [
+                    () => {
+                        logEvent("طوفان باقیمانده از گردوغبار هسته‌ای وزید! بهتر است بقیه در کلبه‌ها بمانند.");
+                    },
+                    () => {
+                        let woodFound = 12;
+                        resources.wood += woodFound;
+                        logEvent(`سیلاب تنه درختان شناور را به ساحل قبیله آورد (+${woodFound} چوب)`);
+                    },
+                    () => {
+                        let lostFood = Math.min(10, resources.food);
+                        resources.food -= lostFood;
+                        logEvent(`جانوران جهش‌یافته به انبار غذا حمله کردند (-${lostFood} غذا)`);
+                    }
+                ];
+                let randomEvt = events[Math.floor(Math.random() * events.length)];
+                randomEvt();
+            }
+
+            updateUI();
+        }, 10000);
+
+        // Initialize Game
+        window.onload = () => {
+            initCountries();
+            updateUI();
+        };
+    </script>
+</body>
+</html>
+

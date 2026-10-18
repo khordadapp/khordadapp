@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#C41E3A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>خرداد | Khordad</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --c-red: #C41E3A;
+      --c-red-dark: #9B1830;
+      --c-blue: #0A2540;
+      --c-blue-light: #123A5C;
+      --c-white: #FFFFFF;
+      --bg: #F5F7FA;
+      --bg-card: #FFFFFF;
+      --bg-sidebar: #FFFFFF;
+      --text: #0A2540;
+      --text-muted: #64748B;
+      --border: #E2E8F0;
+      --shadow: 0 4px 20px rgba(10, 37, 64, 0.07);
+      --radius: 16px;
+      --radius-sm: 12px;
+      --header-h: 56px;
+      --sidebar-w: 250px;
+      --bottom-nav-h: 64px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    [data-theme="dark"] {
+      --bg: #0B1220;
+      --bg-card: #121C2B;
+      --bg-sidebar: #0F1826;
+      --text: #F1F5F9;
+      --text-muted: #94A3B8;
+      --border: #1E2D42;
+      --shadow: 0 4px 24px rgba(0,0,0,0.35);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      font-family: 'Vazirmatn', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      transition: background .3s, color .3s;
+    }
+
+    .app {
+      display: flex;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--bg-sidebar);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 60;
+      transition: transform .3s ease, background .3s, border-color .3s;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--c-red), var(--c-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 17px;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(196,30,58,.3);
+      flex-shrink: 0;
+    }
+
+    .logo-text strong {
+      font-size: 16px;
+      font-weight: 700;
+      display: block;
+      line-height: 1.2;
+    }
+    .logo-text span {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .nav {
+      flex: 1;
+      padding: 12px 10px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 14.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .2s;
+      width: 100%;
+      text-align: right;
+      position: relative;
+    }
+    .nav-btn:hover { background: color-mix(in srgb, var(--c-red) 8%, transparent); color: var(--c-red); }
+    .nav-btn.active {
+      background: color-mix(in srgb, var(--c-red) 12%, transparent);
+      color: var(--c-red);
+      font-weight: 600;
+    }
+    .nav-btn.active::before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 3.5px;
+      height: 55%;
+      background: var(--c-red);
+      border-radius: 4px 0 0 4px;
+    }
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.8;
+      flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      padding: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: var(--header-h);
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      flex-shrink: 0;
+      transition: background .3s, border-color .3s;
+    }
+
+    .page-title {
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .page-title .dot {
+      width: 7px;
+      height: 7px;
+      background: var(--c-red);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-red) 25%, transparent);
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: all .2s;
+    }
+    .icon-btn:hover, .icon-btn:active {
+      border-color: var(--c-red);
+      color: var(--c-red);
+      background: color-mix(in srgb, var(--c-red) 6%, transparent);
+    }
+    .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+    .content {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .page {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .page.active { display: flex; }
+
+    .home {
+      height: 100%;
+      overflow-y: auto;
+      padding: 28px 20px 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background:
+        radial-gradient(ellipse at 15% 10%, color-mix(in srgb, var(--c-red) 10%, transparent) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 90%, color-mix(in srgb, var(--c-blue) 10%, transparent) 0%, transparent 45%),
+        var(--bg);
+    }
+
+    .home-logo {
+      width: 88px;
+      height: 88px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--c-red), var(--c-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
+      box-shadow: 0 12px 36px color-mix(in srgb, var(--c-red) 35%, transparent);
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .home h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--c-red), var(--c-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .home > p {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 360px;
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 14px;
+      cursor: pointer;
+      transition: all .22s;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .card:hover, .card:active {
+      transform: translateY(-3px);
+      border-color: var(--c-red);
+      box-shadow: 0 8px 28px color-mix(in srgb, var(--c-red) 18%, transparent);
+    }
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      margin: 0 auto 12px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, color-mix(in srgb, var(--c-red) 14%, transparent), color-mix(in srgb, var(--c-blue) 14%, transparent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--c-red);
+    }
+    .card-icon svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .card h3 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+    .card p { font-size: 11.5px; color: var(--text-muted); }
+
+    .frame-wrap {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+    }
+    .frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
+      display: block;
+    }
+
+    .frame-status {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      z-index: 5;
+      padding: 24px;
+      text-align: center;
+      transition: opacity .3s;
+    }
+    .frame-status.hidden { opacity: 0; pointer-events: none; }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--c-red);
+      border-radius: 50%;
+      animation: spin .75s linear infinite;
+      margin-bottom: 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .frame-status p { font-size: 14px; color: var(--text-muted); margin-bottom: 16px; max-width: 280px; line-height: 1.6; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 20px;
+      border-radius: 12px;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--c-red), var(--c-blue));
+      color: #fff;
+      box-shadow: 0 4px 14px color-mix(in srgb, var(--c-red) 35%, transparent);
+    }
+    .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--border);
+      color: var(--text);
+    }
+    .btn-outline:hover { border-color: var(--c-red); color: var(--c-red); }
+
+    .settings {
+      height: 100%;
+      overflow-y: auto;
+      padding: 20px 16px 100px;
+      max-width: 640px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .section h2 {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section h2 .ico {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: color-mix(in srgb, var(--c-red) 12%, transparent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--c-red);
+    }
+    .section h2 .ico svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .row:last-child { border-bottom: none; padding-bottom: 0; }
+    .row-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+    .row-info p { font-size: 12px; color: var(--text-muted); }
+
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .color-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .color-item label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .color-item input[type="color"] {
+      width: 100%;
+      height: 40px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      background: var(--bg);
+      padding: 3px;
+    }
+
+    .switch {
+      width: 46px;
+      height: 26px;
+      background: var(--border);
+      border-radius: 30px;
+      position: relative;
+      cursor: pointer;
+      transition: background .25s;
+      flex-shrink: 0;
+    }
+    .switch::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      right: 3px;
+      transition: transform .25s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 2px 5px rgba(0,0,0,.2);
+    }
+    [data-theme="dark"] .switch { background: var(--c-red); }
+    [data-theme="dark"] .switch::after { transform: translateX(-20px); }
+
+    .svc-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all .2s;
+      margin-top: 6px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .svc-card:hover { border-color: var(--c-red); background: color-mix(in srgb, var(--c-red) 5%, transparent); }
+    .svc-card .svc-ico {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--c-red), var(--c-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .svc-card .svc-ico svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .svc-card .svc-txt h4 { font-size: 14px; font-weight: 600; }
+    .svc-card .svc-txt p { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .preset {
+      padding: 7px 14px;
+      border-radius: 20px;
+      border: 1.5px solid var(--border);
+      background: var(--bg);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      color: var(--text);
+      transition: all .2s;
+    }
+    .preset:hover, .preset.active {
+      border-color: var(--c-red);
+      background: color-mix(in srgb, var(--c-red) 10%, transparent);
+      color: var(--c-red);
+    }
+
+    .bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: calc(var(--bottom-nav-h) + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: var(--bg-card);
+      border-top: 1px solid var(--border);
+      z-index: 70;
+      justify-content: space-around;
+      align-items: center;
+      padding-top: 6px;
+    }
+
+    .bnav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 10.5px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 4px 8px;
+      transition: color .2s;
+      min-width: 56px;
+    }
+    .bnav-item.active { color: var(--c-red); font-weight: 600; }
+    .bnav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 55;
+      opacity: 0;
+      transition: opacity .3s;
+    }
+    .overlay.show { opacity: 1; }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(110%);
+        box-shadow: -8px 0 30px rgba(0,0,0,.2);
+      }
+      .sidebar.open { transform: translateX(0); }
+
+      .overlay { display: block; pointer-events: none; }
+      .overlay.show { pointer-events: auto; }
+
+      .bottom-nav { display: flex; }
+
+      .content { padding-bottom: calc(var(--bottom-nav-h) + var(--safe-bottom)); }
+      .home { padding-bottom: calc(var(--bottom-nav-h) + 40px + var(--safe-bottom)); }
+      .settings { padding-bottom: calc(var(--bottom-nav-h) + 40px + var(--safe-bottom)); }
+
+      .cards { grid-template-columns: repeat(2, 1fr); }
+      .home h1 { font-size: 24px; }
+      .home-logo { width: 76px; height: 76px; font-size: 30px; }
+    }
+
+    @media (min-width: 769px) {
+      .menu-btn { display: none !important; }
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="logo" style="padding:0;overflow:hidden;background:transparent;box-shadow:none;">
+          <img src="https://abrehamrahi.ir/o/public/hQZPZGXp/" alt="خرداد" style="width:100%;height:100%;object-fit:cover;border-radius:11px;display:block;" onerror="this.parentElement.textContent='خ';this.parentElement.style.background='linear-gradient(135deg, var(--c-red), var(--c-blue))';this.parentElement.style.boxShadow='0 4px 12px rgba(196,30,58,.3)';">
+        </div>
+        <div class="logo-text">
+          <strong>خرداد</strong>
+          <span>پلتفرم یکپارچه</span>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <button class="nav-btn active" data-page="home" onclick="go('home')">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          خانه
+        </button>
+        <button class="nav-btn" data-page="chat" onclick="go('chat')">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          پیام‌رسان
+        </button>
+        <button class="nav-btn" data-page="vitrin" onclick="go('vitrin')">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+          ویترین
+        </button>
+        <button class="nav-btn" data-page="store" onclick="go('store')">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          فروشگاه
+        </button>
+        <button class="nav-btn" data-page="books" onclick="go('books')">
+          <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          خرداد بوکز
+        </button>
+        <button class="nav-btn" data-page="settings" onclick="go('settings')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          تنظیمات و شخصی‌سازی
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="row" style="padding:8px 4px;border:none;">
+          <div class="row-info">
+            <h4 style="font-size:13px;">حالت شب / روز</h4>
+          </div>
+          <div class="switch" id="themeSwitch" onclick="toggleTheme()"></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="page-title">
+          <span class="dot"></span>
+          <span id="title">خانه</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="icon-btn menu-btn" onclick="toggleSidebar()" title="منو">
+            <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <button class="icon-btn" onclick="reloadPage()" title="بارگذاری مجدد">
+            <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="page active" id="page-home">
+          <div class="home">
+            <div class="home-logo" style="padding:0;overflow:hidden;background:transparent;">
+              <img src="https://abrehamrahi.ir/o/public/hQZPZGXp/" alt="خرداد" style="width:100%;height:100%;object-fit:cover;border-radius:24px;display:block;" onerror="this.parentElement.textContent='خ';this.parentElement.style.background='linear-gradient(135deg, var(--c-red), var(--c-blue))';">
+            </div>
+            <h1>به خرداد خوش آمدید</h1>
+            <p>پیام‌رسان، ویترین، فروشگاه و کتابخانه — همه در یک اپلیکیشن زیبا و یکپارچه</p>
+            <div class="cards">
+              <div class="card" onclick="go('chat')">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+                <h3>پیام‌رسان</h3><p>گفتگو و ارتباط</p>
+              </div>
+              <div class="card" onclick="go('vitrin')">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg></div>
+                <h3>ویترین</h3><p>نمایش محصولات</p>
+              </div>
+              <div class="card" onclick="go('store')">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg></div>
+                <h3>فروشگاه</h3><p>خرید و فروش</p>
+              </div>
+              <div class="card" onclick="go('books')">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+                <h3>خرداد بوکز</h3><p>کتابخانه دیجیتال</p>
+              </div>
+              <div class="card" onclick="go('settings')">
+                <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06"/></svg></div>
+                <h3>شخصی‌سازی</h3><p>رنگ و تنظیمات</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page" id="page-chat">
+          <div class="frame-wrap">
+            <div class="frame-status" id="status-chat">
+              <div class="spinner"></div>
+              <p>در حال بارگذاری پیام‌رسان...</p>
+              <button class="btn btn-outline" style="display:none" id="retry-chat" onclick="loadFrame('chat')">تلاش مجدد</button>
+            </div>
+            <iframe referrerpolicy="no-referrer" loading="eager" id="frame-chat" title="پیام‌رسان" allow="microphone; camera; clipboard-write; fullscreen" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-presentation"></iframe>
+          </div>
+        </div>
+
+        <div class="page" id="page-store">
+          <div class="frame-wrap">
+            <div class="frame-status" id="status-store">
+              <div class="spinner"></div>
+              <p>در حال بارگذاری فروشگاه...</p>
+              <button class="btn btn-outline" style="display:none" id="retry-store" onclick="loadFrame('store')">تلاش مجدد</button>
+            </div>
+            <iframe referrerpolicy="no-referrer" loading="eager" id="frame-store" title="فروشگاه" allow="clipboard-write; fullscreen; payment" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-presentation"></iframe>
+          </div>
+        </div>
+
+        <div class="page" id="page-vitrin">
+          <div class="frame-wrap">
+            <div class="frame-status" id="status-vitrin">
+              <div class="spinner"></div>
+              <p>در حال بارگذاری ویترین...</p>
+              <button class="btn btn-outline" style="display:none" id="retry-vitrin" onclick="loadFrame('vitrin')">تلاش مجدد</button>
+            </div>
+            <iframe referrerpolicy="no-referrer" loading="eager" id="frame-vitrin" title="ویترین" allow="clipboard-write; fullscreen" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-presentation"></iframe>
+          </div>
+        </div>
+
+        <div class="page" id="page-books">
+          <div class="frame-wrap">
+            <div class="frame-status" id="status-books">
+              <div class="spinner"></div>
+              <p>در حال بارگذاری کتابخانه...</p>
+              <button class="btn btn-outline" style="display:none" id="retry-books" onclick="loadFrame('books')">تلاش مجدد</button>
+            </div>
+            <iframe referrerpolicy="no-referrer" loading="eager" id="frame-books" title="خرداد بوکز" allow="clipboard-write; fullscreen" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-presentation"></iframe>
+          </div>
+        </div>
+
+        <div class="page" id="page-settings">
+          <div class="settings">
+            <div class="section">
+              <h2><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2"/></svg></span> ظاهر و تم</h2>
+              <div class="row">
+                <div class="row-info">
+                  <h4>حالت تاریک / روشن</h4>
+                  <p>تم ذخیره می‌شود و دفعات بعد هم اعمال می‌گردد</p>
+                </div>
+                <div class="switch" onclick="toggleTheme()"></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></span> شخصی‌سازی رنگ‌ها</h2>
+              <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:10px;">رنگ‌های اصلی اپ را مطابق سلیقه خود تغییر دهید</p>
+              <div class="color-grid">
+                <div class="color-item">
+                  <label>رنگ قرمز اصلی</label>
+                  <input type="color" id="colorRed" value="#C41E3A" oninput="applyCustomColors()">
+                </div>
+                <div class="color-item">
+                  <label>رنگ آبی اصلی</label>
+                  <input type="color" id="colorBlue" value="#0A2540" oninput="applyCustomColors()">
+                </div>
+              </div>
+              <div style="margin-top:14px;">
+                <label style="font-size:12px;color:var(--text-muted);font-weight:500;">پیش‌فرض‌های آماده</label>
+                <div class="preset-row">
+                  <button class="preset active" data-preset="default" onclick="setPreset('default')">پیش‌فرض خرداد</button>
+                  <button class="preset" data-preset="ocean" onclick="setPreset('ocean')">اقیانوس</button>
+                  <button class="preset" data-preset="sunset" onclick="setPreset('sunset')">غروب</button>
+                  <button class="preset" data-preset="forest" onclick="setPreset('forest')">جنگل</button>
+                  <button class="preset" data-preset="purple" onclick="setPreset('purple')">بنفش</button>
+                </div>
+              </div>
+              <div style="margin-top:14px;">
+                <button class="btn btn-outline" style="width:100%;justify-content:center;" onclick="resetColors()">بازنشانی به حالت اولیه</button>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span> خدمات خرداد</h2>
+              <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:6px;">دسترسی به خدمات تخصصی و پشتیبانی</p>
+              <div class="svc-card" onclick="go('services')">
+                <div class="svc-ico"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="svc-txt">
+                  <h4>خدمات خرداد</h4>
+                  <p>مشاهده داخل اپلیکیشن</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h2><span class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span> درباره</h2>
+              <div class="row">
+                <div class="row-info">
+                  <h4>نسخه اپلیکیشن</h4>
+                  <p>2.0.0 — طراحی شده برای موبایل و دسکتاپ</p>
+                </div>
+              </div>
+              <div class="row">
+                <div class="row-info">
+                  <h4>پلتفرم خرداد</h4>
+                  <p>پیام‌رسان • ویترین • فروشگاه • کتابخانه • خدمات</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="page" id="page-services">
+          <div class="frame-wrap">
+            <div class="frame-status" id="status-services">
+              <div class="spinner"></div>
+              <p>در حال بارگذاری خدمات خرداد...</p>
+              <button class="btn btn-outline" style="display:none" id="retry-services" onclick="loadFrame('services')">تلاش مجدد</button>
+            </div>
+            <iframe referrerpolicy="no-referrer" loading="eager" id="frame-services" title="خدمات خرداد" allow="clipboard-write; fullscreen" sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-presentation"></iframe>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="bnav-item active" data-page="home" onclick="go('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      خانه
+    </button>
+    <button class="bnav-item" data-page="chat" onclick="go('chat')">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      پیام
+    </button>
+    <button class="bnav-item" data-page="vitrin" onclick="go('vitrin')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+      ویترین
+    </button>
+    <button class="bnav-item" data-page="store" onclick="go('store')">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      فروشگاه
+    </button>
+    <button class="bnav-item" data-page="settings" onclick="go('settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06"/></svg>
+      بیشتر
+    </button>
+  </nav>
+
+  <script>
+    const PAGES = {
+      home:     { title: 'خانه' },
+      chat:     { title: 'پیام‌رسان',     url: 'https://a50282-7927.xs1.onjrnm.link/' },
+      vitrin:   { title: 'ویترین',         url: 'http://worldwariv.ir.m.ihweb.ir' },
+      store:    { title: 'فروشگاه',       url: 'http://worldwariv.ir.m.ihweb.ir/store.html' },
+      books:    { title: 'خرداد بوکز',    url: 'https://worldwariv.ir.m.ihweb.ir/ketab.html' },
+      services: { title: 'خدمات خرداد',   url: 'http://worldwariv.ir.m.ihweb.ir/khadamat.html' },
+      settings: { title: 'تنظیمات و شخصی‌سازی' }
+    };
+
+    const PRESETS = {
+      default: { red: '#C41E3A', blue: '#0A2540' },
+      ocean:   { red: '#0077B6', blue: '#023E8A' },
+      sunset:  { red: '#E85D04', blue: '#370617' },
+      forest:  { red: '#2D6A4F', blue: '#1B4332' },
+      purple:  { red: '#7B2CBF', blue: '#3C096C' }
+    };
+
+    let current = 'home';
+    let loaded = {};
+
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('kh-theme', theme);
+    }
+    function toggleTheme() {
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      applyTheme(cur === 'dark' ? 'light' : 'dark');
+    }
+    (function() {
+      applyTheme(localStorage.getItem('kh-theme') || 'light');
+    })();
+
+    function applyCustomColors() {
+      const red = document.getElementById('colorRed').value;
+      const blue = document.getElementById('colorBlue').value;
+      document.documentElement.style.setProperty('--c-red', red);
+      document.documentElement.style.setProperty('--c-blue', blue);
+      localStorage.setItem('kh-colors', JSON.stringify({ red, blue }));
+      document.querySelectorAll('.preset').forEach(p => p.classList.remove('active'));
+    }
+
+    function setPreset(name) {
+      const p = PRESETS[name];
+      if (!p) return;
+      document.getElementById('colorRed').value = p.red;
+      document.getElementById('colorBlue').value = p.blue;
+      document.documentElement.style.setProperty('--c-red', p.red);
+      document.documentElement.style.setProperty('--c-blue', p.blue);
+      localStorage.setItem('kh-colors', JSON.stringify(p));
+      document.querySelectorAll('.preset').forEach(el => {
+        el.classList.toggle('active', el.dataset.preset === name);
+      });
+    }
+
+    function resetColors() {
+      setPreset('default');
+    }
+
+    (function loadColors() {
+      const saved = localStorage.getItem('kh-colors');
+      if (saved) {
+        try {
+          const c = JSON.parse(saved);
+          document.getElementById('colorRed').value = c.red;
+          document.getElementById('colorBlue').value = c.blue;
+          document.documentElement.style.setProperty('--c-red', c.red);
+          document.documentElement.style.setProperty('--c-blue', c.blue);
+        } catch(e) {}
+      }
+    })();
+
+    function go(page) {
+      if (!PAGES[page]) return;
+      current = page;
+
+      document.getElementById('title').textContent = PAGES[page].title;
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+      document.querySelectorAll('.bnav-item').forEach(b => b.classList.toggle('active', b.dataset.page === page));
+      document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + page));
+
+      if (PAGES[page].url) {
+        if (!loaded[page]) {
+          loadFrame(page);
+        }
+      }
+
+      closeSidebar();
+    }
+
+    function loadFrame(page) {
+      const conf = PAGES[page];
+      if (!conf || !conf.url) return;
+
+      const iframe = document.getElementById('frame-' + page);
+      const status = document.getElementById('status-' + page);
+      const retryBtn = document.getElementById('retry-' + page);
+
+      if (!iframe || !status) return;
+
+      status.classList.remove('hidden');
+      status.querySelector('.spinner').style.display = 'block';
+      status.querySelector('p').textContent = 'در حال بارگذاری ' + conf.title + '...';
+      if (retryBtn) retryBtn.style.display = 'none';
+
+      // Reset
+      try { iframe.removeAttribute('src'); } catch(e) {}
+      iframe.src = 'about:blank';
+
+      setTimeout(() => {
+        // Force load inside iframe only (never navigate top window)
+        iframe.setAttribute('src', conf.url);
+        loaded[page] = true;
+
+        const hideTimer = setTimeout(() => {
+          status.classList.add('hidden');
+        }, 3200);
+
+        iframe.onload = function() {
+          clearTimeout(hideTimer);
+          status.classList.add('hidden');
+          // Try to keep in-app navigation for same-origin (most remote sites are cross-origin)
+          try {
+            const doc = iframe.contentDocument || iframe.contentWindow.document;
+            if (doc) {
+              doc.querySelectorAll('a[target="_blank"]').forEach(function(a) {
+                a.setAttribute('target', '_self');
+              });
+            }
+          } catch (err) {
+            // Cross-origin: cannot access. Sandbox without top-navigation helps keep clicks in frame.
+          }
+        };
+
+        iframe.onerror = function() {
+          status.querySelector('.spinner').style.display = 'none';
+          status.querySelector('p').innerHTML = 'بارگذاری ناموفق بود. اتصال یا محدودیت سایت را بررسی کنید.';
+          if (retryBtn) retryBtn.style.display = 'inline-flex';
+        };
+
+        setTimeout(() => {
+          if (!status.classList.contains('hidden')) {
+            status.querySelector('.spinner').style.display = 'none';
+            status.querySelector('p').innerHTML = 'اگر صفحه خالی است، سایت ممکن است iframe را مسدود کرده باشد.<br>روی «تلاش مجدد» بزنید. لینک‌ها داخل خود اپ باز می‌مانند.';
+            if (retryBtn) retryBtn.style.display = 'inline-flex';
+          }
+        }, 10000);
+      }, 100);
+    }
+
+    function reloadPage() {
+      if (PAGES[current] && PAGES[current].url) {
+        loaded[current] = false;
+        loadFrame(current);
+      }
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('overlay').classList.toggle('show');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('overlay').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>خرداد نقاشی | بازی نقاشی و قضاوت</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f0f1a;
+            --card: rgba(22, 22, 40, 0.9);
+            --primary: #a78bfa;
+            --primary-glow: rgba(167, 139, 250, 0.4);
+            --accent: #f472b6;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #f87171;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: rgba(255,255,255,0.08);
+            --radius: 20px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            background-image:
+                radial-gradient(ellipse at 15% 30%, rgba(167, 139, 250, 0.15) 0%, transparent 45%),
+                radial-gradient(ellipse at 85% 70%, rgba(244, 114, 182, 0.12) 0%, transparent 40%);
+        }
+
+        .app {
+            width: 100%;
+            max-width: 520px;
+            background: var(--card);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.55);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            padding: 18px 22px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.2rem;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0f0f1a;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.12);
+            color: var(--text);
+            transform: scale(1.05);
+        }
+
+        /* Prompt */
+        .prompt-bar {
+            margin: 0 20px 14px;
+            background: linear-gradient(135deg, rgba(167,139,250,0.15), rgba(244,114,182,0.1));
+            border: 1px solid rgba(167,139,250,0.25);
+            border-radius: 16px;
+            padding: 14px 18px;
+            text-align: center;
+        }
+
+        .prompt-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .prompt-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* Canvas Area */
+        .canvas-wrapper {
+            margin: 0 20px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            background: #fff;
+            position: relative;
+            touch-action: none;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.05);
+        }
+
+        #drawCanvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .canvas-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(15,15,26,0.7);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            border-radius: 16px;
+        }
+
+        .canvas-overlay.show {
+            opacity: 1;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            padding: 16px 20px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .tools-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tool-btn {
+            width: 44px;
+            height: 44px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .tool-btn:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        .tool-btn.active {
+            border-color: var(--primary);
+            background: rgba(167,139,250,0.2);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .color-swatch:hover {
+            transform: scale(1.15);
+        }
+
+        .color-swatch.active {
+            border-color: white;
+            transform: scale(1.2);
+            box-shadow: 0 0 0 2px var(--primary);
+        }
+
+        .size-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.05);
+            padding: 6px 12px;
+            border-radius: 12px;
+        }
+
+        .size-control input[type="range"] {
+            width: 80px;
+            accent-color: var(--primary);
+        }
+
+        .size-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            min-width: 28px;
+        }
+
+        /* Action Buttons */
+        .actions {
+            padding: 6px 20px 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #a78bfa, #f472b6);
+            color: white;
+            box-shadow: 0 4px 18px var(--primary-glow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px var(--primary-glow);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.06);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 0 20px 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Result Modal */
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10,10,20,0.88);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            border-radius: 28px;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .result-modal {
+            background: var(--card);
+            border-radius: 24px;
+            padding: 28px 24px;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            border: 1px solid var(--border);
+            transform: scale(0.85);
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            max-height: 90%;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.show .result-modal {
+            transform: scale(1);
+        }
+
+        .score-circle {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.4rem;
+            font-weight: 800;
+            position: relative;
+            background: conic-gradient(var(--primary) var(--score-deg, 0deg), rgba(255,255,255,0.08) 0deg);
+            box-shadow: 0 0 30px var(--primary-glow);
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            inset: 8px;
+            background: var(--card);
+            border-radius: 50%;
+        }
+
+        .score-circle span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
+
+        .result-comment {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 18px;
+            min-height: 60px;
+        }
+
+        .stars {
+            font-size: 1.6rem;
+            letter-spacing: 4px;
+            margin-bottom: 18px;
+        }
+
+        .detail-scores {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        .detail-item {
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.8rem;
+        }
+
+        .detail-item .label {
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .detail-item .value {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* History Panel */
+        .history-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease;
+            border-top: 1px solid transparent;
+        }
+
+        .history-panel.open {
+            max-height: 260px;
+            border-top-color: var(--border);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .history-list {
+            padding: 0 16px 14px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .history-item {
+            background: rgba(255,255,255,0.04);
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .history-item .prompt {
+            color: var(--text-muted);
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 10px;
+        }
+
+        .history-item .score {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 0 20px 14px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            opacity: 0.6;
+        }
+
+        /* Confetti */
+        #confettiCanvas {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 90;
+            border-radius: 28px;
+        }
+
+        /* Loading judge */
+        .judging {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(167,139,250,0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(30,30,50,0.95);
+            color: white;
+            padding: 12px 22px;
+            border-radius: 24px;
+            font-size: 0.9rem;
+            z-index: 200;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            animation: toastIn 0.3s ease;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(12px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app" id="app">
+        <canvas id="confettiCanvas"></canvas>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">خ</div>
+                <span>خرداد نقاشی</span>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" id="historyBtn" title="تاریخچه">📜</button>
+                <button class="icon-btn" id="newPromptBtn" title="موضوع جدید">🎲</button>
+            </div>
+        </div>
+
+        <!-- Prompt -->
+        <div class="prompt-bar">
+            <div class="prompt-label">موضوع نقاشی</div>
+            <div class="prompt-text" id="promptText">یک گربه بامزه بکش</div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-wrapper" id="canvasWrapper">
+            <canvas id="drawCanvas" width="480" height="400"></canvas>
+            <div class="canvas-overlay" id="canvasOverlay">در حال بررسی نقاشی...</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-item">⏱️ <span id="timeSpent">۰۰:۰۰</span></div>
+            <div class="stat-item">🖌️ <span id="strokeCount">۰</span> خط</div>
+        </div>
+
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <div class="tools-row">
+                <button class="tool-btn active" data-tool="pen" title="قلم">✏️</button>
+                <button class="tool-btn" data-tool="eraser" title="پاک‌کن">🧽</button>
+                <button class="tool-btn" id="undoBtn" title="واگرد">↩️</button>
+                <button class="tool-btn" id="clearBtn" title="پاک کردن همه">🗑️</button>
+            </div>
+            <div class="tools-row" id="colorPalette">
+                <!-- Colors injected -->
+            </div>
+            <div class="tools-row">
+                <div class="size-control">
+                    <span class="size-label">نازک</span>
+                    <input type="range" id="brushSize" min="2" max="40" value="8">
+                    <span class="size-label">ضخیم</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <button class="btn btn-outline" id="skipBtn">رد کردن موضوع</button>
+            <button class="btn btn-primary" id="finishBtn">تمام کردم! قضاوت کن</button>
+        </div>
+
+        <!-- History -->
+        <div class="history-panel" id="historyPanel">
+            <div class="history-header">
+                <span>تاریخچه نقاشی‌ها</span>
+                <button class="icon-btn" id="clearHistoryBtn" style="width:32px;height:32px;font-size:0.9rem;">🗑️</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+
+        <div class="footer">خرداد نقاشی • نقاشی بکش، نمره بگیر</div>
+
+        <!-- Result Modal -->
+        <div class="modal-overlay" id="resultModal">
+            <div class="result-modal" id="resultContent">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== Prompts ====================
+        const PROMPTS = [
+            'یک گربه بامزه بکش',
+            'یک خورشید خندان بکش',
+            'یک درخت بزرگ بکش',
+            'یک خانه رویایی بکش',
+            'یک ماشین سریع بکش',
+            'یک گل زیبا بکش',
+            'یک ماهی در آب بکش',
+            'یک پرنده در حال پرواز بکش',
+            'یک بستنی خوشمزه بکش',
+            'یک ربات بامزه بکش',
+            'یک ابر بارانی بکش',
+            'یک کوهستان بکش',
+            'یک چهره خندان بکش',
+            'یک سگ بازیگوش بکش',
+            'یک فضاپیما بکش',
+            'یک قایق روی دریا بکش',
+            'یک سیب قرمز بکش',
+            'یک پروانه بکش',
+            'یک قلعه قدیمی بکش',
+            'یک اژدهای کوچک بکش',
+            'یک دوچرخه بکش',
+            'یک کتاب باز بکش',
+            'یک ستاره دنباله‌دار بکش',
+            'یک کاکتوس بکش',
+            'یک پیتزا بکش'
+        ];
+
+        // ==================== State ====================
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
+        let currentTool = 'pen';
+        let currentColor = '#1e293b';
+        let brushSize = 8;
+        let lastX = 0, lastY = 0;
+        let strokes = 0;
+        let startTime = Date.now();
+        let timerInterval = null;
+        let undoStack = [];
+        let currentPrompt = '';
+        let history = [];
+        let hasDrawn = false;
+
+        const COLORS = [
+            '#1e293b', '#ef4444', '#f97316', '#eab308', '#22c55e',
+            '#06b6d4', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff'
+        ];
+
+        // ==================== Init Canvas ====================
+        function initCanvas() {
+            // High DPI
+            const ratio = window.devicePixelRatio || 1;
+            const wrapper = document.getElementById('canvasWrapper');
+            const w = wrapper.clientWidth;
+            const h = Math.round(w * 0.85);
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            canvas.width = w * ratio;
+            canvas.height = h * ratio;
+            ctx.scale(ratio, ratio);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            clearCanvas(true);
+        }
+
+        function clearCanvas(saveState = false) {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (saveState) saveUndoState();
+            hasDrawn = false;
+            strokes = 0;
+            document.getElementById('strokeCount').textContent = '۰';
+        }
+
+        function saveUndoState() {
+            try {
+                undoStack.push(canvas.toDataURL('image/png'));
+                if (undoStack.length > 15) undoStack.shift();
+            } catch (e) {}
+        }
+
+        function undo() {
+            if (undoStack.length < 2) return;
+            undoStack.pop(); // current
+            const prev = undoStack[undoStack.length - 1];
+            const img = new Image();
+            img.onload = () => {
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const ratio = window.devicePixelRatio || 1;
+                ctx.drawImage(img, 0, 0, canvas.width / ratio, canvas.height / ratio);
+                ctx.scale(ratio, ratio);
+            };
+            img.src = prev;
+        }
+
+        // ==================== Drawing ====================
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function startDraw(e) {
+            e.preventDefault();
+            isDrawing = true;
+            const pos = getPos(e);
+            lastX = pos.x;
+            lastY = pos.y;
+            saveUndoState();
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            e.preventDefault();
+            const pos = getPos(e);
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(pos.x, pos.y);
+
+            if (currentTool === 'eraser') {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.strokeStyle = 'rgba(0,0,0,1)';
+                ctx.lineWidth = brushSize * 2;
+            } else {
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.strokeStyle = currentColor;
+                ctx.lineWidth = brushSize;
+            }
+
+            ctx.stroke();
+            lastX = pos.x;
+            lastY = pos.y;
+            hasDrawn = true;
+            strokes++;
+            document.getElementById('strokeCount').textContent = toPersian(Math.floor(strokes / 3));
+        }
+
+        function stopDraw() {
+            isDrawing = false;
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        // ==================== Analysis & Judgment ====================
+        function analyzeDrawing() {
+            const ratio = window.devicePixelRatio || 1;
+            const w = canvas.width / ratio;
+            const h = canvas.height / ratio;
+
+            // Get image data (need to reset transform temporarily for accurate read)
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imageData.data;
+            ctx.scale(ratio, ratio);
+
+            let totalPixels = data.length / 4;
+            let nonWhite = 0;
+            let colorSet = new Set();
+            let minX = canvas.width, minY = canvas.height, maxX = 0, maxY = 0;
+            let edgeScore = 0;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const r = data[i], g = data[i + 1], b = data[i + 2], a = data[i + 3];
+                if (a < 30) continue;
+
+                // Not near white
+                if (r < 245 || g < 245 || b < 245) {
+                    nonWhite++;
+                    // Quantize color
+                    const key = `${Math.floor(r/32)},${Math.floor(g/32)},${Math.floor(b/32)}`;
+                    colorSet.add(key);
+
+                    const px = (i / 4) % canvas.width;
+                    const py = Math.floor((i / 4) / canvas.width);
+                    if (px < minX) minX = px;
+                    if (px > maxX) maxX = px;
+                    if (py < minY) minY = py;
+                    if (py > maxY) maxY = py;
+                }
+            }
+
+            const coverage = nonWhite / totalPixels; // 0-1
+            const uniqueColors = colorSet.size;
+            const bboxW = (maxX - minX) / canvas.width;
+            const bboxH = (maxY - minY) / canvas.height;
+            const composition = Math.min(bboxW, bboxH); // how spread out
+            const timeSpent = (Date.now() - startTime) / 1000;
+            const strokeScore = Math.min(strokes / 80, 1);
+
+            // Calculate scores (0-10)
+            let coverageScore = Math.min(coverage * 25, 10); // ideal around 15-40% coverage
+            if (coverage > 0.5) coverageScore = Math.max(4, 10 - (coverage - 0.5) * 15);
+            if (coverage < 0.02) coverageScore = 1;
+
+            let colorScore = Math.min(uniqueColors * 1.8, 10);
+            let effortScore = Math.min((strokeScore * 5 + Math.min(timeSpent / 25, 1) * 5), 10);
+            let compositionScore = Math.min(composition * 12, 10);
+            if (composition < 0.15) compositionScore = 3;
+
+            // Weighted final
+            let finalScore = (
+                coverageScore * 0.25 +
+                colorScore * 0.2 +
+                effortScore * 0.3 +
+                compositionScore * 0.25
+            );
+
+            // Random variation for fun (±1)
+            finalScore += (Math.random() - 0.5) * 1.5;
+            finalScore = Math.max(1, Math.min(10, Math.round(finalScore * 10) / 10));
+
+            return {
+                final: finalScore,
+                coverage: Math.round(coverageScore * 10) / 10,
+                color: Math.round(colorScore * 10) / 10,
+                effort: Math.round(effortScore * 10) / 10,
+                composition: Math.round(compositionScore * 10) / 10,
+                coveragePct: Math.round(coverage * 100),
+                colors: uniqueColors,
+                time: Math.round(timeSpent)
+            };
+        }
+
+        function getJudgment(score, metrics) {
+            const high = [
+                'عالی بود! انگار یه نقاش حرفه‌ای پشت قلم بوده 🎨',
+                'وای چه نقاشی قشنگی! واقعاً ذوق کردم',
+                'آفرین! جزئیاتش خیلی خوب کار شده بود',
+                'این یکی از بهترین نقاشی‌هایی بود که دیدم 🔥',
+                'دمت گرم! هم خلاقانه بود هم تمیز'
+            ];
+            const mid = [
+                'بد نبود! ایده‌ش خوب بود، فقط کمی بیشتر جزئیات می‌خواست',
+                'قابل قبول بود. با تمرین بهتر هم می‌شی',
+                'نقاشی قشنگی شد، ولی می‌تونست جذاب‌تر باشه',
+                'خوب پیش رفتی! یه کم بیشتر روی ترکیب‌بندی کار کن',
+                'امتیاز متوسط رو گرفتی. پتانسیل بالایی داری'
+            ];
+            const low = [
+                'یه کم عجله کردی انگار... دفعه بعد بیشتر وقت بذار',
+                'نقاشی خیلی ساده بود. جزئیات بیشتری اضافه کن',
+                'ایده داشت، ولی اجراش ضعیف بود',
+                'نیاز به تمرین بیشتر داری، ولی ناامید نشو!',
+                'صفحه تقریباً خالی موند... حداقل یه چیزی بکش دیگه 😄'
+            ];
+
+            let comments;
+            if (score >= 8) comments = high;
+            else if (score >= 5) comments = mid;
+            else comments = low;
+
+            let comment = comments[Math.floor(Math.random() * comments.length)];
+
+            // Extra flavor
+            if (metrics.colors >= 5) comment += ' رنگ‌هاش هم قشنگ انتخاب شده بود.';
+            if (metrics.time < 8 && score < 6) comment += ' خیلی سریع تمومش کردی!';
+            if (metrics.coveragePct > 45) comment += ' صفحه رو خوب پر کرده بودی.';
+
+            return comment;
+        }
+
+        function getTitle(score) {
+            if (score >= 9) return 'شاهکار! 🏆';
+            if (score >= 8) return 'عالی! 🌟';
+            if (score >= 6.5) return 'خوب بود! 👍';
+            if (score >= 5) return 'قابل قبول';
+            if (score >= 3) return 'نیاز به تمرین';
+            return 'ضعیف 😅';
+        }
+
+        function getStars(score) {
+            const full = Math.floor(score / 2);
+            const half = score % 2 >= 1 ? 1 : 0;
+            let stars = '⭐'.repeat(full);
+            if (half) stars += '✦';
+            stars += '☆'.repeat(5 - full - half);
+            return stars;
+        }
+
+        // ==================== Finish & Judge ====================
+        async function finishDrawing() {
+            if (!hasDrawn) {
+                showToast('اول یه چیزی بکش!');
+                return;
+            }
+
+            const overlay = document.getElementById('canvasOverlay');
+            const modal = document.getElementById('resultModal');
+            const content = document.getElementById('resultContent');
+
+            overlay.classList.add('show');
+            document.getElementById('finishBtn').disabled = true;
+
+            // Fake thinking delay for dramatic effect
+            await sleep(1200 + Math.random() * 800);
+
+            const metrics = analyzeDrawing();
+            const judgment = getJudgment(metrics.final, metrics);
+            const title = getTitle(metrics.final);
+            const stars = getStars(metrics.final);
+
+            // Save to history
+            history.unshift({
+                prompt: currentPrompt,
+                score: metrics.final,
+                time: metrics.time,
+                date: Date.now()
+            });
+            history = history.slice(0, 20);
+            localStorage.setItem('khordad_draw_history', JSON.stringify(history));
+            renderHistory();
+
+            overlay.classList.remove('show');
+
+            // Show result
+            const deg = (metrics.final / 10) * 360;
+            content.innerHTML = `
+                <div class="score-circle" style="--score-deg: ${deg}deg">
+                    <span>${toPersian(metrics.final)}</span>
+                </div>
+                <div class="result-title">${title}</div>
+                <div class="stars">${stars}</div>
+                <div class="result-comment">${judgment}</div>
+                <div class="detail-scores">
+                    <div class="detail-item">
+                        <div class="label">تلاش و جزئیات</div>
+                        <div class="value">${toPersian(metrics.effort)}/۱۰</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">پوشش صفحه</div>
+                        <div class="value">${toPersian(metrics.coverage)}/۱۰</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">تنوع رنگ</div>
+                        <div class="value">${toPersian(metrics.color)}/۱۰</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="label">ترکیب‌بندی</div>
+                        <div class="value">${toPersian(metrics.composition)}/۱۰</div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-outline" id="closeResultBtn">بستن</button>
+                    <button class="btn btn-primary" id="nextDrawingBtn">موضوع بعدی</button>
+                </div>
+            `;
+
+            modal.classList.add('show');
+
+            if (metrics.final >= 8) {
+                launchConfetti();
+            }
+
+            document.getElementById('closeResultBtn').addEventListener('click', () => {
+                modal.classList.remove('show');
+                document.getElementById('finishBtn').disabled = false;
+            });
+            document.getElementById('nextDrawingBtn').addEventListener('click', () => {
+                modal.classList.remove('show');
+                document.getElementById('finishBtn').disabled = false;
+                newPrompt();
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(r => setTimeout(r, ms));
+        }
+
+        // ==================== Confetti ====================
+        function launchConfetti() {
+            const canvasC = document.getElementById('confettiCanvas');
+            const ctxC = canvasC.getContext('2d');
+            const app = document.getElementById('app');
+            canvasC.width = app.offsetWidth;
+            canvasC.height = app.offsetHeight;
+
+            const particles = [];
+            const colors = ['#a78bfa', '#f472b6', '#34d399', '#fbbf24', '#22d3ee', '#f87171'];
+
+            for (let i = 0; i < 70; i++) {
+                particles.push({
+                    x: canvasC.width / 2,
+                    y: canvasC.height / 3,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: Math.random() * -11 - 2,
+                    size: Math.random() * 8 + 3,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * 360,
+                    rotV: (Math.random() - 0.5) * 12,
+                    life: 1
+                });
+            }
+
+            function animate() {
+                ctxC.clearRect(0, 0, canvasC.width, canvasC.height);
+                let alive = false;
+                particles.forEach(p => {
+                    if (p.life <= 0) return;
+                    alive = true;
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.28;
+                    p.rot += p.rotV;
+                    p.life -= 0.014;
+                    ctxC.save();
+                    ctxC.translate(p.x, p.y);
+                    ctxC.rotate(p.rot * Math.PI / 180);
+                    ctxC.globalAlpha = Math.max(0, p.life);
+                    ctxC.fillStyle = p.color;
+                    ctxC.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctxC.restore();
+                });
+                if (alive) requestAnimationFrame(animate);
+                else ctxC.clearRect(0, 0, canvasC.width, canvasC.height);
+            }
+            animate();
+        }
+
+        // ==================== Helpers ====================
+        function toPersian(n) {
+            return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        }
+
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.className = 'toast';
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 2200);
+        }
+
+        function newPrompt() {
+            currentPrompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
+            document.getElementById('promptText').textContent = currentPrompt;
+            clearCanvas(true);
+            undoStack = [];
+            saveUndoState();
+            startTime = Date.now();
+            strokes = 0;
+            document.getElementById('strokeCount').textContent = '۰';
+            hasDrawn = false;
+        }
+
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const m = Math.floor(elapsed / 60);
+            const s = elapsed % 60;
+            document.getElementById('timeSpent').textContent =
+                toPersian(String(m).padStart(2, '0')) + ':' + toPersian(String(s).padStart(2, '0'));
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            if (history.length === 0) {
+                list.innerHTML = '<div class="empty-history">هنوز نقاشی ثبت نشده</div>';
+                return;
+            }
+            list.innerHTML = history.map(h => `
+                <div class="history-item">
+                    <span class="prompt">${h.prompt}</span>
+                    <span class="score">${toPersian(h.score)}/۱۰</span>
+                </div>
+            `).join('');
+        }
+
+        function loadHistory() {
+            try {
+                history = JSON.parse(localStorage.getItem('khordad_draw_history') || '[]');
+            } catch (e) {
+                history = [];
+            }
+            renderHistory();
+        }
+
+        // ==================== Events ====================
+        function initEvents() {
+            // Drawing
+            canvas.addEventListener('mousedown', startDraw);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('mouseleave', stopDraw);
+            canvas.addEventListener('touchstart', startDraw, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', stopDraw);
+
+            // Tools
+            document.querySelectorAll('[data-tool]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentTool = btn.dataset.tool;
+                });
+            });
+
+            document.getElementById('undoBtn').addEventListener('click', undo);
+            document.getElementById('clearBtn').addEventListener('click', () => {
+                clearCanvas(true);
+                showToast('صفحه پاک شد');
+            });
+
+            // Colors
+            const palette = document.getElementById('colorPalette');
+            COLORS.forEach((c, i) => {
+                const swatch = document.createElement('div');
+                swatch.className = 'color-swatch' + (i === 0 ? ' active' : '');
+                swatch.style.background = c;
+                if (c === '#ffffff') swatch.style.border = '1px solid #ccc';
+                swatch.addEventListener('click', () => {
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                    currentColor = c;
+                    currentTool = 'pen';
+                    document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+                    document.querySelector('[data-tool="pen"]').classList.add('active');
+                });
+                palette.appendChild(swatch);
+            });
+
+            // Brush size
+            document.getElementById('brushSize').addEventListener('input', (e) => {
+                brushSize = parseInt(e.target.value);
+            });
+
+            // Buttons
+            document.getElementById('finishBtn').addEventListener('click', finishDrawing);
+            document.getElementById('skipBtn').addEventListener('click', newPrompt);
+            document.getElementById('newPromptBtn').addEventListener('click', newPrompt);
+
+            document.getElementById('historyBtn').addEventListener('click', () => {
+                document.getElementById('historyPanel').classList.toggle('open');
+            });
+
+            document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+                history = [];
+                localStorage.removeItem('khordad_draw_history');
+                renderHistory();
+                showToast('تاریخچه پاک شد');
+            });
+
+            window.addEventListener('resize', () => {
+                // Simple resize handling - redraw white
+                const ratio = window.devicePixelRatio || 1;
+                const wrapper = document.getElementById('canvasWrapper');
+                const w = wrapper.clientWidth;
+                const h = Math.round(w * 0.85);
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+            });
+        }
+
+        // ==================== Start ====================
+        function init() {
+            initCanvas();
+            loadHistory();
+            initEvents();
+            newPrompt();
+            timerInterval = setInterval(updateTimer, 1000);
+            saveUndoState();
+        }
+
+        init();
+    </script>
+</body>
+</html>

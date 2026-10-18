@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خرداد مرورگر</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-hover: #1557b0;
+            --bg: #ffffff;
+            --bg-secondary: #f1f3f4;
+            --bg-tab: #dee1e6;
+            --bg-tab-active: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --radius: 20px;
+            --danger: #d93025;
+            --success: #188038;
+            --transition: all 0.2s ease;
+        }
+
+        [data-theme="dark"] {
+            --primary: #8ab4f8;
+            --primary-hover: #aecbfa;
+            --bg: #202124;
+            --bg-secondary: #292a2d;
+            --bg-tab: #3c4043;
+            --bg-tab-active: #202124;
+            --text: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border: #3c4043;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== Title Bar / Tabs ===== */
+        .titlebar {
+            background: var(--bg-tab);
+            display: flex;
+            align-items: flex-end;
+            padding: 6px 8px 0;
+            gap: 2px;
+            min-height: 42px;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .tabs-container {
+            display: flex;
+            flex: 1;
+            overflow-x: auto;
+            gap: 2px;
+            align-items: flex-end;
+        }
+
+        .tabs-container::-webkit-scrollbar { height: 0; }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-tab);
+            border-radius: 10px 10px 0 0;
+            min-width: 140px;
+            max-width: 220px;
+            cursor: pointer;
+            position: relative;
+            border: 1px solid transparent;
+            transition: var(--transition);
+            font-size: 0.85rem;
+        }
+
+        .tab.active {
+            background: var(--bg-tab-active);
+            border-color: var(--border);
+            border-bottom-color: var(--bg-tab-active);
+            z-index: 2;
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255,255,255,0.15);
+        }
+
+        [data-theme="dark"] .tab:hover:not(.active) {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .tab-favicon {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+            border-radius: 2px;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .tab-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
+        }
+
+        .tab-close {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            opacity: 0.7;
+            flex-shrink: 0;
+        }
+
+        .tab-close:hover {
+            background: rgba(0,0,0,0.1);
+            opacity: 1;
+        }
+
+        .new-tab-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+            flex-shrink: 0;
+        }
+
+        .new-tab-btn:hover {
+            background: rgba(0,0,0,0.08);
+            color: var(--text);
+        }
+
+        /* ===== Toolbar ===== */
+        .toolbar {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 2px;
+        }
+
+        .nav-btn {
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: var(--bg-secondary);
+            color: var(--text);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .address-bar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border-radius: 24px;
+            padding: 0 14px;
+            height: 40px;
+            border: 1px solid transparent;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .address-bar:focus-within {
+            background: var(--bg);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
+        }
+
+        .address-bar .secure-icon {
+            font-size: 0.95rem;
+            margin-left: 6px;
+            color: var(--success);
+        }
+
+        .address-bar input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--text);
+            direction: ltr;
+            text-align: left;
+            padding: 0 8px;
+        }
+
+        .address-bar input::placeholder {
+            color: var(--text-secondary);
+            direction: rtl;
+            text-align: right;
+        }
+
+        .address-actions {
+            display: flex;
+            gap: 2px;
+        }
+
+        .address-actions button {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .address-actions button:hover {
+            background: rgba(0,0,0,0.06);
+            color: var(--text);
+        }
+
+        .toolbar-right {
+            display: flex;
+            gap: 2px;
+        }
+
+        /* ===== Bookmarks Bar ===== */
+        .bookmarks-bar {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            overflow-x: auto;
+            flex-shrink: 0;
+            min-height: 36px;
+        }
+
+        .bookmarks-bar::-webkit-scrollbar { height: 0; }
+
+        .bookmark-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            color: var(--text);
+            transition: var(--transition);
+            border: none;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .bookmark-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .bookmark-item .fav {
+            font-size: 0.85rem;
+        }
+
+        /* ===== Content Area ===== */
+        .content {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg);
+        }
+
+        .page-frame {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: none;
+            background: white;
+        }
+
+        .page-frame.active {
+            display: block;
+        }
+
+        /* New Tab Page (Google-like) */
+        .newtab-page {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .newtab-page.active {
+            display: flex;
+        }
+
+        .google-logo {
+            font-size: 4.5rem;
+            font-weight: 800;
+            margin-bottom: 28px;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            user-select: none;
+        }
+
+        .google-logo span {
+            -webkit-text-fill-color: var(--primary);
+        }
+
+        .search-box-large {
+            width: 100%;
+            max-width: 580px;
+            display: flex;
+            align-items: center;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 6px 16px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            margin-bottom: 28px;
+        }
+
+        .search-box-large:hover, .search-box-large:focus-within {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            border-color: transparent;
+        }
+
+        [data-theme="dark"] .search-box-large:hover,
+        [data-theme="dark"] .search-box-large:focus-within {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        .search-box-large input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 1rem;
+            padding: 10px 12px;
+            color: var(--text);
+        }
+
+        .search-box-large button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--primary);
+            padding: 6px;
+        }
+
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+            gap: 16px;
+            max-width: 520px;
+            width: 100%;
+        }
+
+        .quick-link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 12px 8px;
+            border-radius: 12px;
+            transition: var(--transition);
+            text-decoration: none;
+            color: var(--text);
+            border: none;
+            background: transparent;
+            font-family: inherit;
+        }
+
+        .quick-link:hover {
+            background: var(--bg-secondary);
+        }
+
+        .quick-link-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .quick-link-title {
+            font-size: 0.8rem;
+            text-align: center;
+            max-width: 80px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Error / Blocked page */
+        .error-page {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .error-page.active {
+            display: flex;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .error-page h2 {
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+
+        .error-page p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            max-width: 420px;
+            line-height: 1.6;
+        }
+
+        /* Side panels (Bookmarks, History, Settings) */
+        .side-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 340px;
+            height: 100%;
+            background: var(--bg);
+            border-left: 1px solid var(--border);
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+            z-index: 100;
+            transform: translateX(-100%);
+            transition: transform 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .side-panel.open {
+            transform: translateX(0);
+        }
+
+        .side-panel-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .side-panel-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .side-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+
+        .panel-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 4px;
+        }
+
+        .panel-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .panel-item-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .panel-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .panel-item-title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .panel-item-url {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            direction: ltr;
+            text-align: right;
+        }
+
+        .panel-item-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            opacity: 0.6;
+            padding: 4px;
+        }
+
+        .panel-item-actions button:hover {
+            opacity: 1;
+        }
+
+        .empty-panel {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Context menu / Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+        }
+
+        .toast {
+            background: var(--bg);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 24px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            font-size: 0.9rem;
+            border: 1px solid var(--border);
+            animation: toastIn 0.25s ease;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Settings inside panel */
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toggle {
+            width: 44px;
+            height: 24px;
+            background: var(--border);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle.active {
+            background: var(--primary);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            right: 3px;
+            transition: var(--transition);
+        }
+
+        .toggle.active::after {
+            right: 23px;
+        }
+
+        /* Modal for add bookmark */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-body label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        .modal-body input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            margin-bottom: 14px;
+        }
+
+        .modal-body input:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .tab {
+                min-width: 100px;
+                max-width: 140px;
+            }
+            .google-logo {
+                font-size: 3rem;
+            }
+            .side-panel {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tabs -->
+    <div class="titlebar">
+        <div class="tabs-container" id="tabsContainer"></div>
+        <button class="new-tab-btn" id="newTabBtn" title="تب جدید">+</button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+        <div class="nav-btns">
+            <button class="nav-btn" id="backBtn" title="قبلی" disabled>←</button>
+            <button class="nav-btn" id="forwardBtn" title="بعدی" disabled>→</button>
+            <button class="nav-btn" id="reloadBtn" title="بارگذاری مجدد">↻</button>
+            <button class="nav-btn" id="homeBtn" title="خانه">🏠</button>
+        </div>
+
+        <div class="address-bar" id="addressBar">
+            <span class="secure-icon" id="secureIcon">🔒</span>
+            <input type="text" id="urlInput" placeholder="جستجو در گوگل یا وارد کردن آدرس..." spellcheck="false">
+            <div class="address-actions">
+                <button id="clearUrlBtn" title="پاک کردن" style="display:none;">✕</button>
+                <button id="goBtn" title="برو">🔍</button>
+            </div>
+        </div>
+
+        <div class="toolbar-right">
+            <button class="nav-btn" id="bookmarkBtn" title="افزودن به نشانک‌ها">⭐</button>
+            <button class="nav-btn" id="bookmarksPanelBtn" title="نشانک‌ها">📑</button>
+            <button class="nav-btn" id="historyPanelBtn" title="تاریخچه">🕒</button>
+            <button class="nav-btn" id="menuBtn" title="منو">⋮</button>
+        </div>
+    </div>
+
+    <!-- Bookmarks Bar -->
+    <div class="bookmarks-bar" id="bookmarksBar"></div>
+
+    <!-- Content -->
+    <div class="content" id="content">
+        <!-- Frames and newtab will be injected here -->
+    </div>
+
+    <!-- Side Panel -->
+    <div class="side-panel" id="sidePanel">
+        <div class="side-panel-header">
+            <h3 id="panelTitle">نشانک‌ها</h3>
+            <button class="nav-btn" id="closePanelBtn">✕</button>
+        </div>
+        <div class="side-panel-content" id="panelContent"></div>
+    </div>
+
+    <!-- Add Bookmark Modal -->
+    <div class="modal-overlay" id="bookmarkModal">
+        <div class="modal">
+            <div class="modal-header">افزودن نشانک</div>
+            <div class="modal-body">
+                <label>نام</label>
+                <input type="text" id="bmNameInput" placeholder="نام نشانک">
+                <label>آدرس</label>
+                <input type="text" id="bmUrlInput" placeholder="https://..." dir="ltr">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" id="cancelBmBtn">انصراف</button>
+                <button class="btn btn-primary" id="saveBmBtn">ذخیره</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ==================== Storage ====================
+        const STORAGE = {
+            bookmarks: 'khordad_browser_bookmarks',
+            history: 'khordad_browser_history',
+            settings: 'khordad_browser_settings',
+            theme: 'khordad_browser_theme'
+        };
+
+        // ==================== State ====================
+        let tabs = [];
+        let activeTabId = null;
+        let bookmarks = [];
+        let historyList = [];
+        let settings = {
+            darkMode: false,
+            showBookmarksBar: true,
+            searchEngine: 'google'
+        };
+
+        // Default quick links for new tab
+        const DEFAULT_QUICK_LINKS = [
+            { title: 'گوگل', url: 'https://www.google.com', icon: '🔍' },
+            { title: 'یوتیوب', url: 'https://www.youtube.com', icon: '▶️' },
+            { title: 'ویکی‌پدیا', url: 'https://fa.wikipedia.org', icon: '📖' },
+            { title: 'گیت‌هاب', url: 'https://github.com', icon: '🐙' },
+            { title: 'توییتر', url: 'https://x.com', icon: '🐦' },
+            { title: 'ردیت', url: 'https://www.reddit.com', icon: '🤖' },
+            { title: 'نقشه', url: 'https://www.openstreetmap.org', icon: '🗺️' },
+            { title: 'ایمیل', url: 'https://mail.google.com', icon: '📧' }
+        ];
+
+        // ==================== Utilities ====================
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        }
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2500);
+        }
+
+        function isValidUrl(string) {
+            try {
+                const url = new URL(string.startsWith('http') ? string : 'https://' + string);
+                return url.hostname.includes('.');
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function normalizeUrl(input) {
+            input = input.trim();
+            if (!input) return null;
+            if (isValidUrl(input)) {
+                return input.startsWith('http') ? input : 'https://' + input;
+            }
+            // Treat as search
+            return null;
+        }
+
+        function getSearchUrl(query) {
+            return `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+        }
+
+        function getFavicon(url) {
+            try {
+                const u = new URL(url);
+                return `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=32`;
+            } catch {
+                return null;
+            }
+        }
+
+        // ==================== Storage ====================
+        function loadData() {
+            try {
+                bookmarks = JSON.parse(localStorage.getItem(STORAGE.bookmarks) || '[]');
+                historyList = JSON.parse(localStorage.getItem(STORAGE.history) || '[]');
+                const s = localStorage.getItem(STORAGE.settings);
+                if (s) settings = { ...settings, ...JSON.parse(s) };
+                const theme = localStorage.getItem(STORAGE.theme);
+                if (theme === 'dark') {
+                    settings.darkMode = true;
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function saveBookmarks() {
+            localStorage.setItem(STORAGE.bookmarks, JSON.stringify(bookmarks));
+        }
+
+        function saveHistory() {
+            localStorage.setItem(STORAGE.history, JSON.stringify(historyList.slice(0, 100)));
+        }
+
+        function saveSettings() {
+            localStorage.setItem(STORAGE.settings, JSON.stringify(settings));
+        }
+
+        // ==================== Tabs ====================
+        function createTab(url = null, title = 'تب جدید') {
+            const id = generateId();
+            const tab = {
+                id,
+                url: url,
+                title: title,
+                history: url ? [url] : [],
+                historyIndex: url ? 0 : -1,
+                isNewTab: !url
+            };
+            tabs.push(tab);
+            renderTabs();
+            switchTab(id);
+            if (url) {
+                loadUrlInTab(id, url);
+            } else {
+                showNewTabPage(id);
+            }
+            return id;
+        }
+
+        function switchTab(id) {
+            activeTabId = id;
+            renderTabs();
+            updateToolbar();
+            // Hide all frames / newtabs
+            document.querySelectorAll('.page-frame, .newtab-page, .error-page').forEach(el => {
+                el.classList.remove('active');
+            });
+            const tab = tabs.find(t => t.id === id);
+            if (!tab) return;
+
+            if (tab.isNewTab || !tab.url) {
+                const newtab = document.getElementById('newtab-' + id);
+                if (newtab) newtab.classList.add('active');
+                else showNewTabPage(id);
+            } else {
+                const frame = document.getElementById('frame-' + id);
+                if (frame) {
+                    frame.classList.add('active');
+                }
+            }
+            document.getElementById('urlInput').value = tab.url || '';
+            updateSecureIcon(tab.url);
+        }
+
+        function closeTab(id, e) {
+            if (e) e.stopPropagation();
+            const idx = tabs.findIndex(t => t.id === id);
+            if (idx === -1) return;
+
+            // Remove DOM elements
+            const frame = document.getElementById('frame-' + id);
+            if (frame) frame.remove();
+            const newtab = document.getElementById('newtab-' + id);
+            if (newtab) newtab.remove();
+            const error = document.getElementById('error-' + id);
+            if (error) error.remove();
+
+            tabs.splice(idx, 1);
+
+            if (tabs.length === 0) {
+                createTab();
+                return;
+            }
+
+            if (activeTabId === id) {
+                const newActive = tabs[Math.max(0, idx - 1)];
+                switchTab(newActive.id);
+            } else {
+                renderTabs();
+            }
+        }
+
+        function renderTabs() {
+            const container = document.getElementById('tabsContainer');
+            container.innerHTML = tabs.map(tab => `
+                <div class="tab ${tab.id === activeTabId ? 'active' : ''}" data-id="${tab.id}">
+                    <div class="tab-favicon">${tab.isNewTab ? '🏠' : '🌐'}</div>
+                    <div class="tab-title">${escapeHtml(tab.title)}</div>
+                    <button class="tab-close" data-close="${tab.id}">✕</button>
+                </div>
+            `).join('');
+
+            container.querySelectorAll('.tab').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('tab-close')) return;
+                    switchTab(el.dataset.id);
+                });
+            });
+            container.querySelectorAll('.tab-close').forEach(btn => {
+                btn.addEventListener('click', (e) => closeTab(btn.dataset.close, e));
+            });
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.textContent = text;
+            return d.innerHTML;
+        }
+
+        // ==================== Navigation ====================
+        function loadUrlInTab(tabId, url, addToHistory = true) {
+            const tab = tabs.find(t => t.id === tabId);
+            if (!tab) return;
+
+            tab.isNewTab = false;
+            tab.url = url;
+            tab.title = extractTitle(url);
+
+            if (addToHistory) {
+                // Truncate forward history
+                tab.history = tab.history.slice(0, tab.historyIndex + 1);
+                tab.history.push(url);
+                tab.historyIndex = tab.history.length - 1;
+            }
+
+            // Remove previous newtab if exists
+            const oldNewtab = document.getElementById('newtab-' + tabId);
+            if (oldNewtab) oldNewtab.remove();
+
+            // Create or update iframe
+            let frame = document.getElementById('frame-' + tabId);
+            if (!frame) {
+                frame = document.createElement('iframe');
+                frame.id = 'frame-' + tabId;
+                frame.className = 'page-frame';
+                frame.sandbox = 'allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-presentation';
+                document.getElementById('content').appendChild(frame);
+
+                frame.addEventListener('load', () => {
+                    try {
+                        // Try to get title (often blocked by CORS)
+                        const docTitle = frame.contentDocument?.title;
+                        if (docTitle) {
+                            tab.title = docTitle;
+                            renderTabs();
+                        }
+                    } catch (e) {}
+                });
+            }
+
+            // Hide others
+            document.querySelectorAll('.page-frame, .newtab-page, .error-page').forEach(el => el.classList.remove('active'));
+            frame.classList.add('active');
+
+            // Many sites block iframe. We try anyway.
+            try {
+                frame.src = url;
+            } catch (e) {
+                showErrorPage(tabId, url);
+            }
+
+            // Add to global history
+            addToGlobalHistory(url, tab.title);
+
+            if (tabId === activeTabId) {
+                document.getElementById('urlInput').value = url;
+                updateSecureIcon(url);
+                updateToolbar();
+                renderTabs();
+            }
+        }
+
+        function showErrorPage(tabId, url) {
+            let errorEl = document.getElementById('error-' + tabId);
+            if (!errorEl) {
+                errorEl = document.createElement('div');
+                errorEl.id = 'error-' + tabId;
+                errorEl.className = 'error-page';
+                document.getElementById('content').appendChild(errorEl);
+            }
+            errorEl.innerHTML = `
+                <div class="error-icon">🚫</div>
+                <h2>این سایت در مرورگر داخلی قابل نمایش نیست</h2>
+                <p>بسیاری از سایت‌ها به دلایل امنیتی اجازه نمایش داخل iframe را نمی‌دهند.</p>
+                <p style="direction:ltr;font-size:0.85rem;opacity:0.7;">${escapeHtml(url)}</p>
+                <div style="display:flex;gap:10px;margin-top:10px;">
+                    <button class="btn btn-primary" onclick="window.open('${url.replace(/'/g, "\\'")}', '_blank')">باز کردن در تب جدید مرورگر</button>
+                    <button class="btn btn-outline" onclick="createTab()">تب جدید</button>
+                </div>
+            `;
+            document.querySelectorAll('.page-frame, .newtab-page').forEach(el => el.classList.remove('active'));
+            errorEl.classList.add('active');
+        }
+
+        function showNewTabPage(tabId) {
+            let el = document.getElementById('newtab-' + tabId);
+            if (!el) {
+                el = document.createElement('div');
+                el.id = 'newtab-' + tabId;
+                el.className = 'newtab-page';
+                el.innerHTML = `
+                    <div class="google-logo">خرداد</div>
+                    <div class="search-box-large">
+                        <button onclick="document.getElementById('newtab-search-${tabId}').focus()">🔍</button>
+                        <input type="text" id="newtab-search-${tabId}" placeholder="جستجو در گوگل یا وارد کردن آدرس..." autocomplete="off">
+                    </div>
+                    <div class="quick-links" id="quicklinks-${tabId}"></div>
+                `;
+                document.getElementById('content').appendChild(el);
+
+                // Search on enter
+                const input = el.querySelector(`#newtab-search-${tabId}`);
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        navigate(input.value);
+                    }
+                });
+
+                // Quick links
+                renderQuickLinks(tabId);
+            }
+            document.querySelectorAll('.page-frame, .newtab-page, .error-page').forEach(e => e.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function renderQuickLinks(tabId) {
+            const container = document.getElementById('quicklinks-' + tabId);
+            if (!container) return;
+            const links = bookmarks.length > 0 
+                ? bookmarks.slice(0, 8).map(b => ({ title: b.title, url: b.url, icon: '⭐' }))
+                : DEFAULT_QUICK_LINKS;
+
+            container.innerHTML = links.map(link => `
+                <button class="quick-link" data-url="${escapeHtml(link.url)}">
+                    <div class="quick-link-icon">${link.icon || '🌐'}</div>
+                    <div class="quick-link-title">${escapeHtml(link.title)}</div>
+                </button>
+            `).join('');
+
+            container.querySelectorAll('.quick-link').forEach(btn => {
+                btn.addEventListener('click', () => navigate(btn.dataset.url));
+            });
+        }
+
+        function extractTitle(url) {
+            try {
+                const u = new URL(url);
+                return u.hostname.replace('www.', '');
+            } catch {
+                return 'صفحه';
+            }
+        }
+
+        function navigate(input) {
+            if (!input || !input.trim()) return;
+            input = input.trim();
+
+            const url = normalizeUrl(input);
+            const finalUrl = url || getSearchUrl(input);
+
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (tab) {
+                loadUrlInTab(activeTabId, finalUrl);
+            }
+        }
+
+        function goBack() {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (!tab || tab.historyIndex <= 0) return;
+            tab.historyIndex--;
+            const url = tab.history[tab.historyIndex];
+            loadUrlInTab(activeTabId, url, false);
+        }
+
+        function goForward() {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (!tab || tab.historyIndex >= tab.history.length - 1) return;
+            tab.historyIndex++;
+            const url = tab.history[tab.historyIndex];
+            loadUrlInTab(activeTabId, url, false);
+        }
+
+        function reload() {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (!tab || !tab.url) return;
+            const frame = document.getElementById('frame-' + activeTabId);
+            if (frame) {
+                frame.src = frame.src;
+            }
+        }
+
+        function goHome() {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (tab) {
+                tab.isNewTab = true;
+                tab.url = null;
+                tab.title = 'تب جدید';
+                const frame = document.getElementById('frame-' + activeTabId);
+                if (frame) frame.remove();
+                const error = document.getElementById('error-' + activeTabId);
+                if (error) error.remove();
+                showNewTabPage(activeTabId);
+                document.getElementById('urlInput').value = '';
+                renderTabs();
+                updateToolbar();
+            }
+        }
+
+        function updateToolbar() {
+            const tab = tabs.find(t => t.id === activeTabId);
+            if (!tab) return;
+            document.getElementById('backBtn').disabled = tab.historyIndex <= 0;
+            document.getElementById('forwardBtn').disabled = tab.historyIndex >= tab.history.length - 1 || tab.history.length === 0;
+        }
+
+        function updateSecureIcon(url) {
+            const icon = document.getElementById('secureIcon');
+            if (url && url.startsWith('https')) {
+                icon.textContent = '🔒';
+                icon.style.color = 'var(--success)';
+            } else if (url) {
+                icon.textContent = '⚠️';
+                icon.style.color = 'orange';
+            } else {
+                icon.textContent = '🔍';
+                icon.style.color = 'var(--text-secondary)';
+            }
+        }
+
+        // ==================== Bookmarks ====================
+        function addBookmark(title, url) {
+            if (!url) return;
+            const exists = bookmarks.some(b => b.url === url);
+            if (exists) {
+                showToast('قبلاً ذخیره شده');
+                return;
+            }
+            bookmarks.unshift({
+                id: generateId(),
+                title: title || extractTitle(url),
+                url,
+                addedAt: Date.now()
+            });
+            saveBookmarks();
+            renderBookmarksBar();
+            showToast('به نشانک‌ها اضافه شد ⭐');
+        }
+
+        function removeBookmark(id) {
+            bookmarks = bookmarks.filter(b => b.id !== id);
+            saveBookmarks();
+            renderBookmarksBar();
+            if (document.getElementById('sidePanel').classList.contains('open')) {
+                renderBookmarksPanel();
+            }
+            showToast('حذف شد');
+        }
+
+        function renderBookmarksBar() {
+            const bar = document.getElementById('bookmarksBar');
+            if (!settings.showBookmarksBar) {
+                bar.style.display = 'none';
+                return;
+            }
+            bar.style.display = 'flex';
+            if (bookmarks.length === 0) {
+                bar.innerHTML = `<span style="font-size:0.8rem;color:var(--text-secondary);padding:4px 8px;">نشانکی وجود ندارد — از ⭐ استفاده کنید</span>`;
+                return;
+            }
+            bar.innerHTML = bookmarks.slice(0, 12).map(b => `
+                <button class="bookmark-item" data-url="${escapeHtml(b.url)}" title="${escapeHtml(b.url)}">
+                    <span class="fav">⭐</span>
+                    <span>${escapeHtml(b.title)}</span>
+                </button>
+            `).join('');
+
+            bar.querySelectorAll('.bookmark-item').forEach(btn => {
+                btn.addEventListener('click', () => navigate(btn.dataset.url));
+            });
+        }
+
+        function renderBookmarksPanel() {
+            document.getElementById('panelTitle').textContent = 'نشانک‌ها';
+            const content = document.getElementById('panelContent');
+            if (bookmarks.length === 0) {
+                content.innerHTML = `<div class="empty-panel"><div style="font-size:2.5rem;margin-bottom:10px;">⭐</div><p>هنوز نشانکی ذخیره نکرده‌اید</p></div>`;
+                return;
+            }
+            content.innerHTML = bookmarks.map(b => `
+                <div class="panel-item" data-url="${escapeHtml(b.url)}">
+                    <div class="panel-item-icon">⭐</div>
+                    <div class="panel-item-info">
+                        <div class="panel-item-title">${escapeHtml(b.title)}</div>
+                        <div class="panel-item-url">${escapeHtml(b.url)}</div>
+                    </div>
+                    <div class="panel-item-actions">
+                        <button onclick="event.stopPropagation(); removeBookmark('${b.id}')">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            content.querySelectorAll('.panel-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    navigate(el.dataset.url);
+                    closeSidePanel();
+                });
+            });
+        }
+
+        // ==================== History ====================
+        function addToGlobalHistory(url, title) {
+            historyList = historyList.filter(h => h.url !== url);
+            historyList.unshift({
+                id: generateId(),
+                url,
+                title: title || extractTitle(url),
+                time: Date.now()
+            });
+            historyList = historyList.slice(0, 100);
+            saveHistory();
+        }
+
+        function renderHistoryPanel() {
+            document.getElementById('panelTitle').textContent = 'تاریخچه';
+            const content = document.getElementById('panelContent');
+            if (historyList.length === 0) {
+                content.innerHTML = `<div class="empty-panel"><div style="font-size:2.5rem;margin-bottom:10px;">🕒</div><p>تاریخچه‌ای وجود ندارد</p></div>`;
+                return;
+            }
+            content.innerHTML = historyList.map(h => `
+                <div class="panel-item" data-url="${escapeHtml(h.url)}">
+                    <div class="panel-item-icon">🕒</div>
+                    <div class="panel-item-info">
+                        <div class="panel-item-title">${escapeHtml(h.title)}</div>
+                        <div class="panel-item-url">${escapeHtml(h.url)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            content.querySelectorAll('.panel-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    navigate(el.dataset.url);
+                    closeSidePanel();
+                });
+            });
+        }
+
+        function renderSettingsPanel() {
+            document.getElementById('panelTitle').textContent = 'تنظیمات';
+            const content = document.getElementById('panelContent');
+            content.innerHTML = `
+                <div class="setting-row">
+                    <span>حالت شب</span>
+                    <div class="toggle ${settings.darkMode ? 'active' : ''}" id="themeToggle"></div>
+                </div>
+                <div class="setting-row">
+                    <span>نمایش نوار نشانک‌ها</span>
+                    <div class="toggle ${settings.showBookmarksBar ? 'active' : ''}" id="bmBarToggle"></div>
+                </div>
+                <div style="padding: 16px 12px;">
+                    <button class="btn btn-primary" style="width:100%;margin-bottom:10px;" id="exportDataBtn">⬇️ بکاپ نشانک‌ها و تاریخچه</button>
+                    <button class="btn btn-outline" style="width:100%;margin-bottom:10px;" id="importDataBtn">⬆️ بازیابی بکاپ</button>
+                    <input type="file" id="importFile" accept=".json" style="display:none;">
+                    <button class="btn btn-outline" style="width:100%;color:var(--danger);border-color:var(--danger);" id="clearDataBtn">🗑️ پاک کردن همه داده‌ها</button>
+                </div>
+                <p style="text-align:center;font-size:0.8rem;color:var(--text-secondary);padding:10px;">
+                    خرداد مرورگر نسخه ۱.۰<br>
+                    داده‌ها فقط روی دستگاه شما ذخیره می‌شوند
+                </p>
+            `;
+
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('bmBarToggle').addEventListener('click', function() {
+                this.classList.toggle('active');
+                settings.showBookmarksBar = this.classList.contains('active');
+                saveSettings();
+                renderBookmarksBar();
+            });
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            document.getElementById('importDataBtn').addEventListener('click', () => document.getElementById('importFile').click());
+            document.getElementById('importFile').addEventListener('change', (e) => {
+                if (e.target.files[0]) importData(e.target.files[0]);
+            });
+            document.getElementById('clearDataBtn').addEventListener('click', () => {
+                if (confirm('همه نشانک‌ها و تاریخچه پاک شود؟')) {
+                    bookmarks = [];
+                    historyList = [];
+                    saveBookmarks();
+                    saveHistory();
+                    renderBookmarksBar();
+                    showToast('داده‌ها پاک شد');
+                }
+            });
+        }
+
+        // ==================== Side Panel ====================
+        function openSidePanel(type) {
+            const panel = document.getElementById('sidePanel');
+            panel.classList.add('open');
+            if (type === 'bookmarks') renderBookmarksPanel();
+            else if (type === 'history') renderHistoryPanel();
+            else if (type === 'settings') renderSettingsPanel();
+        }
+
+        function closeSidePanel() {
+            document.getElementById('sidePanel').classList.remove('open');
+        }
+
+        // ==================== Theme ====================
+        function toggleTheme() {
+            settings.darkMode = !settings.darkMode;
+            if (settings.darkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem(STORAGE.theme, 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                localStorage.setItem(STORAGE.theme, 'light');
+            }
+            saveSettings();
+            // Update toggle if visible
+            const t = document.getElementById('themeToggle');
+            if (t) t.classList.toggle('active', settings.darkMode);
+        }
+
+        // ==================== Backup ====================
+        function exportData() {
+            const data = {
+                app: 'خرداد مرورگر',
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                bookmarks,
+                history: historyList,
+                settings
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `khordad-browser-backup-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('بکاپ دانلود شد');
+        }
+
+        function importData(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.bookmarks) bookmarks = data.bookmarks;
+                    if (data.history) historyList = data.history;
+                    if (data.settings) settings = { ...settings, ...data.settings };
+                    saveBookmarks();
+                    saveHistory();
+                    saveSettings();
+                    renderBookmarksBar();
+                    showToast('داده‌ها بازیابی شد');
+                } catch {
+                    showToast('فایل نامعتبر است');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ==================== Events ====================
+        function initEvents() {
+            document.getElementById('newTabBtn').addEventListener('click', () => createTab());
+
+            document.getElementById('backBtn').addEventListener('click', goBack);
+            document.getElementById('forwardBtn').addEventListener('click', goForward);
+            document.getElementById('reloadBtn').addEventListener('click', reload);
+            document.getElementById('homeBtn').addEventListener('click', goHome);
+
+            document.getElementById('urlInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    navigate(e.target.value);
+                }
+            });
+            document.getElementById('urlInput').addEventListener('input', (e) => {
+                document.getElementById('clearUrlBtn').style.display = e.target.value ? 'flex' : 'none';
+            });
+            document.getElementById('clearUrlBtn').addEventListener('click', () => {
+                document.getElementById('urlInput').value = '';
+                document.getElementById('clearUrlBtn').style.display = 'none';
+                document.getElementById('urlInput').focus();
+            });
+            document.getElementById('goBtn').addEventListener('click', () => {
+                navigate(document.getElementById('urlInput').value);
+            });
+
+            document.getElementById('bookmarkBtn').addEventListener('click', () => {
+                const tab = tabs.find(t => t.id === activeTabId);
+                if (tab && tab.url) {
+                    document.getElementById('bmNameInput').value = tab.title;
+                    document.getElementById('bmUrlInput').value = tab.url;
+                    document.getElementById('bookmarkModal').classList.add('active');
+                } else {
+                    showToast('ابتدا به یک صفحه بروید');
+                }
+            });
+
+            document.getElementById('saveBmBtn').addEventListener('click', () => {
+                const name = document.getElementById('bmNameInput').value.trim();
+                const url = document.getElementById('bmUrlInput').value.trim();
+                if (url) {
+                    addBookmark(name || extractTitle(url), url.startsWith('http') ? url : 'https://' + url);
+                    document.getElementById('bookmarkModal').classList.remove('active');
+                }
+            });
+            document.getElementById('cancelBmBtn').addEventListener('click', () => {
+                document.getElementById('bookmarkModal').classList.remove('active');
+            });
+
+            document.getElementById('bookmarksPanelBtn').addEventListener('click', () => openSidePanel('bookmarks'));
+            document.getElementById('historyPanelBtn').addEventListener('click', () => openSidePanel('history'));
+            document.getElementById('menuBtn').addEventListener('click', () => openSidePanel('settings'));
+            document.getElementById('closePanelBtn').addEventListener('click', closeSidePanel);
+
+            // Close modal on overlay
+            document.getElementById('bookmarkModal').addEventListener('click', (e) => {
+                if (e.target.id === 'bookmarkModal') {
+                    document.getElementById('bookmarkModal').classList.remove('active');
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey || e.metaKey) {
+                    if (e.key === 't') {
+                        e.preventDefault();
+                        createTab();
+                    } else if (e.key === 'w') {
+                        e.preventDefault();
+                        if (activeTabId) closeTab(activeTabId);
+                    } else if (e.key === 'l') {
+                        e.preventDefault();
+                        document.getElementById('urlInput').focus();
+                        document.getElementById('urlInput').select();
+                    } else if (e.key === 'd') {
+                        e.preventDefault();
+                        document.getElementById('bookmarkBtn').click();
+                    } else if (e.key === 'h') {
+                        e.preventDefault();
+                        openSidePanel('history');
+                    }
+                }
+            });
+        }
+
+        // ==================== Init ====================
+        function init() {
+            loadData();
+            initEvents();
+            renderBookmarksBar();
+            createTab(); // Start with one new tab
+        }
+
+        init();
+    </script>
+</body>
+</html>

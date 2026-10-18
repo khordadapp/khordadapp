@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>خرداد | در حال بروزرسانی</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0088cc;
+      --primary-light: #00a0e3;
+      --bg-dark: #0a1628;
+      --accent: #ff3b5c;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Vazirmatn', Tahoma, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-dark);
+      color: #fff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* پس‌زمینه متحرک */
+    .bg-circles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+
+    .circle {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 136, 204, 0.15) 0%, transparent 70%);
+      animation: float 18s infinite ease-in-out;
+    }
+
+    .circle:nth-child(1) {
+      width: 400px;
+      height: 400px;
+      top: -100px;
+      right: -80px;
+      animation-delay: 0s;
+    }
+
+    .circle:nth-child(2) {
+      width: 300px;
+      height: 300px;
+      bottom: -60px;
+      left: -60px;
+      animation-delay: -5s;
+      background: radial-gradient(circle, rgba(255, 59, 92, 0.12) 0%, transparent 70%);
+    }
+
+    .circle:nth-child(3) {
+      width: 200px;
+      height: 200px;
+      top: 40%;
+      left: 15%;
+      animation-delay: -10s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(30px, -40px) scale(1.05); }
+      66% { transform: translate(-20px, 25px) scale(0.95); }
+    }
+
+    /* محتوای اصلی */
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 40px 28px;
+      max-width: 480px;
+      width: 100%;
+    }
+
+    /* لوگو با انیمیشن */
+    .logo-wrap {
+      position: relative;
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 36px;
+    }
+
+    .logo {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #0088cc, #0066aa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.5);
+      animation: pulse-ring 2.4s infinite;
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo-inner {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: #0a1628;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #0088cc;
+    }
+
+    .logo-kh {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #ff3b5c;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .logo-name {
+      font-size: 0.85rem;
+      color: #fff;
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
+    /* حلقه‌های پالس دور لوگو */
+    .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 136, 204, 0.4);
+      animation: expand-ring 2.4s infinite;
+    }
+
+    .ring:nth-child(2) { animation-delay: 0.6s; }
+    .ring:nth-child(3) { animation-delay: 1.2s; }
+
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0.5); }
+      70% { box-shadow: 0 0 0 25px rgba(0, 136, 204, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 136, 204, 0); }
+    }
+
+    @keyframes expand-ring {
+      0% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1.8);
+        opacity: 0;
+      }
+    }
+
+    /* متن‌ها */
+    h1 {
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      background: linear-gradient(90deg, #fff, #90caf9);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeUp 0.8s ease-out both;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      color: #a0b8d0;
+      line-height: 1.8;
+      margin-bottom: 36px;
+      animation: fadeUp 0.8s ease-out 0.15s both;
+    }
+
+    /* نوار پیشرفت متحرک */
+    .progress-wrap {
+      margin: 0 auto 32px;
+      max-width: 280px;
+      animation: fadeUp 0.8s ease-out 0.3s both;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 40%;
+      background: linear-gradient(90deg, #0088cc, #00c6ff, #0088cc);
+      background-size: 200% 100%;
+      border-radius: 10px;
+      animation: progress-move 2s ease-in-out infinite, shimmer 1.5s linear infinite;
+    }
+
+    @keyframes progress-move {
+      0% { width: 15%; margin-right: 0; }
+      50% { width: 70%; margin-right: 15%; }
+      100% { width: 15%; margin-right: 0; }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .status {
+      font-size: 0.9rem;
+      color: #7eb8d8;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .dots span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #0088cc;
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .dots span:nth-child(1) { animation-delay: -0.32s; }
+    .dots span:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+      40% { transform: scale(1.2); opacity: 1; }
+    }
+
+    /* دکمه تلاش مجدد */
+    .retry-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #0088cc, #0066aa);
+      color: #fff;
+      border: none;
+      padding: 14px 32px;
+      border-radius: 50px;
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(0, 136, 204, 0.35);
+      transition: all 0.3s ease;
+      animation: fadeUp 0.8s ease-out 0.45s both;
+    }
+
+    .retry-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 136, 204, 0.5);
+    }
+
+    .retry-btn:active {
+      transform: translateY(0);
+    }
+
+    .retry-btn svg {
+      width: 18px;
+      height: 18px;
+      transition: transform 0.4s ease;
+    }
+
+    .retry-btn:hover svg {
+      transform: rotate(180deg);
+    }
+
+    /* ذرات شناور */
+    .particles {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(0, 168, 255, 0.6);
+      border-radius: 50%;
+      animation: rise 12s infinite linear;
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+      }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% {
+        transform: translateY(-20vh) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(25px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* نسخه موبایل */
+    @media (max-width: 480px) {
+      h1 { font-size: 1.45rem; }
+      .subtitle { font-size: 0.95rem; }
+      .logo-wrap { width: 110px; height: 110px; }
+      .logo, .logo-inner { width: 110px; height: 110px; }
+      .logo-inner { width: 92px; height: 92px; }
+      .logo-kh { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- پس‌زمینه دایره‌ای -->
+  <div class="bg-circles">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+  </div>
+
+  <!-- ذرات شناور -->
+  <div class="particles" id="particles"></div>
+
+  <div class="container">
+    <!-- لوگو با حلقه‌های پالس -->
+    <div class="logo-wrap">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="logo">
+        <div class="logo-inner">
+          <div class="logo-kh">KH</div>
+          <div class="logo-name">خرداد</div>
+        </div>
+      </div>
+    </div>
+
+    <h1>در حال بروزرسانی...</h1>
+    <p class="subtitle">
+      اپلیکیشن خرداد در حال دریافت نسخه جدید است.<br>
+      لطفاً چند لحظه صبر کنید و دوباره تلاش کنید.
+    </p>
+
+    <!-- نوار پیشرفت -->
+    <div class="progress-wrap">
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="status">
+        <span>در حال آماده‌سازی</span>
+        <div class="dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- دکمه تلاش مجدد -->
+    <button class="retry-btn" onclick="location.reload()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M23 4v6h-6"></path>
+        <path d="M1 20v-6h6"></path>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+      </svg>
+      تلاش مجدد
+    </button>
+  </div>
+
+  <script>
+    // ساخت ذرات شناور
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 18; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDelay = Math.random() * 12 + 's';
+      p.style.animationDuration = (8 + Math.random() * 8) + 's';
+      p.style.width = p.style.height = (2 + Math.random() * 4) + 'px';
+      particlesContainer.appendChild(p);
+    }
+  </script>
+</body>
+</html>

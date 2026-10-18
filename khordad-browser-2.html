@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>خرداد مرورگر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1a73e8;
+  --bg: #fff;
+  --bg2: #f1f3f4;
+  --bg-tab: #dee1e6;
+  --bg-tab-active: #fff;
+  --text: #202124;
+  --text2: #5f6368;
+  --border: #dadce0;
+  --success: #188038;
+  --danger: #d93025;
+}
+[data-theme="dark"] {
+  --primary: #8ab4f8;
+  --bg: #202124;
+  --bg2: #303134;
+  --bg-tab: #3c4043;
+  --bg-tab-active: #202124;
+  --text: #e8eaed;
+  --text2: #9aa0a6;
+  --border: #5f6368;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tabs */
+.titlebar {
+  background: var(--bg-tab);
+  display: flex;
+  align-items: flex-end;
+  padding: 5px 5px 0;
+  min-height: 38px;
+  flex-shrink: 0;
+}
+.tabs-wrap {
+  flex: 1;
+  display: flex;
+  overflow-x: auto;
+  gap: 2px;
+  scrollbar-width: none;
+}
+.tabs-wrap::-webkit-scrollbar { display: none; }
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 9px;
+  min-width: 100px;
+  max-width: 160px;
+  border-radius: 9px 9px 0 0;
+  cursor: pointer;
+  font-size: 0.78rem;
+  flex-shrink: 0;
+  border: 1px solid transparent;
+}
+.tab.active {
+  background: var(--bg-tab-active);
+  border-color: var(--border);
+  border-bottom-color: var(--bg-tab-active);
+}
+.tab-title { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tab-x {
+  width: 16px; height: 16px; border: none; background: transparent;
+  border-radius: 50%; color: var(--text2); cursor: pointer; font-size: 0.75rem;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.tab-x:hover { background: rgba(0,0,0,0.1); }
+.new-tab {
+  width: 30px; height: 30px; border: none; background: transparent;
+  border-radius: 50%; font-size: 1.25rem; color: var(--text2);
+  cursor: pointer; margin-bottom: 3px; flex-shrink: 0;
+}
+
+/* Toolbar */
+.toolbar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 5px 7px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+.nav { display: flex; gap: 1px; flex-shrink: 0; }
+.nav button {
+  width: 32px; height: 32px; border: none; background: transparent;
+  border-radius: 50%; font-size: 1rem; color: var(--text2);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.nav button:hover:not(:disabled) { background: var(--bg2); color: var(--text); }
+.nav button:disabled { opacity: 0.35; cursor: default; }
+
+.addr {
+  flex: 1; display: flex; align-items: center;
+  background: var(--bg2); border-radius: 18px;
+  height: 34px; padding: 0 8px; border: 1px solid transparent; min-width: 0;
+}
+.addr:focus-within {
+  background: var(--bg);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
+}
+.addr .ico { font-size: 0.8rem; margin-left: 3px; flex-shrink: 0; }
+.addr input {
+  flex: 1; border: none; background: transparent; outline: none;
+  font-family: inherit; font-size: 0.88rem; color: var(--text);
+  direction: ltr; text-align: left; min-width: 0; padding: 0 5px;
+}
+.addr .acts { display: flex; gap: 1px; flex-shrink: 0; }
+.addr .acts button {
+  width: 26px; height: 26px; border: none; background: transparent;
+  border-radius: 50%; font-size: 0.9rem; color: var(--text2); cursor: pointer;
+}
+.right { display: flex; gap: 1px; flex-shrink: 0; }
+
+/* Bookmarks bar */
+.bm-bar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 2px 7px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow-x: auto;
+  flex-shrink: 0;
+  min-height: 30px;
+  scrollbar-width: none;
+}
+.bm-bar::-webkit-scrollbar { display: none; }
+.bm-item {
+  display: flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 10px; border: none;
+  background: transparent; font-family: inherit; font-size: 0.72rem;
+  color: var(--text); cursor: pointer; white-space: nowrap;
+}
+.bm-item:hover { background: var(--bg2); }
+
+/* Content */
+.content { flex: 1; position: relative; overflow: hidden; background: var(--bg); }
+.view {
+  position: absolute; inset: 0;
+  display: none; flex-direction: column; overflow: hidden;
+}
+.view.active { display: flex; }
+iframe.frame { width: 100%; height: 100%; border: none; background: #fff; }
+
+/* Home */
+.home {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 16px; overflow-y: auto;
+}
+.logo {
+  font-size: 3.4rem; font-weight: 800; margin-bottom: 22px;
+  background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; user-select: none;
+}
+.home-search {
+  width: 100%; max-width: 480px; display: flex; align-items: center;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 22px;
+  padding: 3px 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); margin-bottom: 24px;
+}
+.home-search input {
+  flex: 1; border: none; outline: none; background: transparent;
+  font-family: inherit; font-size: 0.95rem; padding: 11px 6px; color: var(--text);
+}
+.home-search button {
+  background: none; border: none; font-size: 1.2rem; color: var(--primary);
+  cursor: pointer; padding: 5px;
+}
+.qlinks {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 10px; max-width: 380px; width: 100%;
+}
+.qlink {
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  padding: 8px 4px; border-radius: 12px; border: none; background: transparent;
+  font-family: inherit; color: var(--text); cursor: pointer; font-size: 0.72rem;
+}
+.qlink:hover { background: var(--bg2); }
+.qlink-ico {
+  width: 42px; height: 42px; border-radius: 50%; background: var(--bg2);
+  display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
+}
+
+/* Search page */
+.search-page { flex: 1; overflow-y: auto; padding: 16px; }
+.search-page h2 { font-size: 1.1rem; margin-bottom: 6px; }
+.search-page .sub { font-size: 0.85rem; color: var(--text2); margin-bottom: 18px; }
+.engine-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;
+}
+.engine-btn {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border);
+  background: var(--bg2); font-family: inherit; font-size: 0.95rem;
+  font-weight: 600; color: var(--text); cursor: pointer; transition: 0.15s;
+}
+.engine-btn:hover { border-color: var(--primary); background: var(--bg); }
+.engine-btn span { font-size: 1.3rem; }
+.hint {
+  text-align: center; font-size: 0.8rem; color: var(--text2);
+  line-height: 1.6; padding: 10px;
+}
+
+/* Error */
+.error-page {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 24px; text-align: center;
+}
+.error-page .ico { font-size: 3.2rem; margin-bottom: 10px; opacity: 0.5; }
+.error-page h2 { font-size: 1.15rem; margin-bottom: 8px; }
+.error-page p { color: var(--text2); font-size: 0.88rem; margin-bottom: 14px; max-width: 300px; line-height: 1.55; }
+
+/* Side panel */
+.panel {
+  position: absolute; top: 0; left: 0;
+  width: min(300px, 92vw); height: 100%;
+  background: var(--bg); border-left: 1px solid var(--border);
+  box-shadow: -3px 0 16px rgba(0,0,0,0.12);
+  z-index: 50; transform: translateX(-110%);
+  transition: transform 0.22s ease;
+  display: flex; flex-direction: column;
+}
+.panel.open { transform: translateX(0); }
+.panel-hd {
+  padding: 12px 14px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.panel-hd h3 { font-size: 1rem; }
+.panel-bd { flex: 1; overflow-y: auto; padding: 8px; }
+.p-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px; border-radius: 9px; cursor: pointer; margin-bottom: 2px;
+}
+.p-item:hover { background: var(--bg2); }
+.p-ico {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--bg2);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 0.95rem;
+}
+.p-info { flex: 1; min-width: 0; }
+.p-title { font-size: 0.88rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.p-url { font-size: 0.7rem; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; direction: ltr; text-align: right; }
+.empty { text-align: center; padding: 36px 12px; color: var(--text2); font-size: 0.88rem; }
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 9px; border-bottom: 1px solid var(--border);
+}
+.toggle {
+  width: 40px; height: 22px; background: var(--border); border-radius: 11px;
+  position: relative; cursor: pointer; transition: 0.2s;
+}
+.toggle.on { background: var(--primary); }
+.toggle::after {
+  content: ''; position: absolute; width: 16px; height: 16px;
+  background: #fff; border-radius: 50%; top: 3px; right: 3px; transition: 0.2s;
+}
+.toggle.on::after { right: 21px; }
+
+/* Modal */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100; opacity: 0; visibility: hidden; transition: 0.2s; padding: 14px;
+}
+.modal-bg.show { opacity: 1; visibility: visible; }
+.modal {
+  background: var(--bg); border-radius: 14px; width: 100%; max-width: 340px;
+  overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+}
+.modal-hd { padding: 13px 16px; border-bottom: 1px solid var(--border); font-weight: 700; }
+.modal-bd { padding: 14px 16px; }
+.modal-bd label { display: block; font-size: 0.78rem; color: var(--text2); margin-bottom: 3px; }
+.modal-bd input {
+  width: 100%; padding: 9px 11px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--bg2); color: var(--text);
+  font-family: inherit; font-size: 0.88rem; outline: none; margin-bottom: 10px;
+}
+.modal-ft {
+  padding: 10px 16px; border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 7px;
+}
+.btn {
+  padding: 7px 14px; border-radius: 18px; border: none;
+  font-family: inherit; font-size: 0.84rem; font-weight: 600; cursor: pointer;
+}
+.btn-p { background: var(--primary); color: #fff; }
+.btn-o { background: transparent; border: 1px solid var(--border); color: var(--text); }
+
+.toast {
+  position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%);
+  background: var(--bg); color: var(--text); padding: 9px 16px;
+  border-radius: 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  font-size: 0.84rem; border: 1px solid var(--border); z-index: 200;
+}
+
+@media (max-width: 480px) {
+  .tab { min-width: 90px; max-width: 120px; }
+  .logo { font-size: 2.6rem; }
+  .qlinks { gap: 6px; }
+  .engine-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="titlebar">
+  <div class="tabs-wrap" id="tabsWrap"></div>
+  <button class="new-tab" id="newTabBtn">+</button>
+</div>
+
+<div class="toolbar">
+  <div class="nav">
+    <button id="backBtn" disabled title="قبلی">←</button>
+    <button id="forwardBtn" disabled title="بعدی">→</button>
+    <button id="reloadBtn" title="بارگذاری">↻</button>
+    <button id="homeBtn" title="خانه">🏠</button>
+  </div>
+  <div class="addr">
+    <span class="ico" id="secIcon">🔍</span>
+    <input type="text" id="urlInput" placeholder="جستجو یا آدرس..." spellcheck="false" autocomplete="off">
+    <div class="acts">
+      <button id="clearBtn" style="display:none">✕</button>
+      <button id="goBtn">🔍</button>
+    </div>
+  </div>
+  <div class="right">
+    <button class="nav-btn-r" id="bmBtn" title="نشانک" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;font-size:1rem;color:var(--text2);cursor:pointer">⭐</button>
+    <button class="nav-btn-r" id="bmPanelBtn" title="نشانک‌ها" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;font-size:1rem;color:var(--text2);cursor:pointer">📑</button>
+    <button class="nav-btn-r" id="histBtn" title="تاریخچه" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;font-size:1rem;color:var(--text2);cursor:pointer">🕒</button>
+    <button class="nav-btn-r" id="menuBtn" title="منو" style="width:32px;height:32px;border:none;background:transparent;border-radius:50%;font-size:1rem;color:var(--text2);cursor:pointer">⋮</button>
+  </div>
+</div>
+
+<div class="bm-bar" id="bmBar"></div>
+<div class="content" id="content"></div>
+
+<!-- Side Panel (always starts closed) -->
+<div class="panel" id="panel">
+  <div class="panel-hd">
+    <h3 id="panelTitle">نشانک‌ها</h3>
+    <button id="closePanel" style="width:30px;height:30px;border:none;background:transparent;border-radius:50%;font-size:1.1rem;color:var(--text2);cursor:pointer">✕</button>
+  </div>
+  <div class="panel-bd" id="panelBody"></div>
+</div>
+
+<!-- Overlay to close panel when clicking outside -->
+<div id="panelOverlay" style="position:absolute;inset:0;z-index:40;display:none;"></div>
+
+<div class="modal-bg" id="bmModal">
+  <div class="modal">
+    <div class="modal-hd">افزودن نشانک</div>
+    <div class="modal-bd">
+      <label>نام</label>
+      <input type="text" id="bmName">
+      <label>آدرس</label>
+      <input type="text" id="bmUrl" dir="ltr" placeholder="https://...">
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-o" id="bmCancel">انصراف</button>
+      <button class="btn btn-p" id="bmSave">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const SK = {
+    bm: 'kbr_bm_v2',
+    hist: 'kbr_hist_v2',
+    set: 'kbr_set_v2',
+    theme: 'kbr_theme_v2'
+  };
+
+  let tabs = [];
+  let activeId = null;
+  let bookmarks = [];
+  let historyList = [];
+  let settings = { dark: false, showBmBar: true };
+
+  const QUICK = [
+    { t: 'گوگل', u: 'https://www.google.com', i: '🔍' },
+    { t: 'یوتیوب', u: 'https://www.youtube.com', i: '▶️' },
+    { t: 'ویکی‌پدیا', u: 'https://fa.wikipedia.org', i: '📖' },
+    { t: 'گیت‌هاب', u: 'https://github.com', i: '🐙' },
+    { t: 'توییتر', u: 'https://x.com', i: '🐦' },
+    { t: 'ردیت', u: 'https://www.reddit.com', i: '🤖' },
+    { t: 'نقشه', u: 'https://www.openstreetmap.org', i: '🗺️' },
+    { t: 'ایمیل', u: 'https://mail.google.com', i: '📧' }
+  ];
+
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+  function esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; }
+  function toast(m) {
+    const o = document.querySelector('.toast'); if (o) o.remove();
+    const t = document.createElement('div'); t.className = 'toast'; t.textContent = m;
+    document.body.appendChild(t); setTimeout(() => t.remove(), 2200);
+  }
+  function isUrl(s) {
+    s = s.trim();
+    if (/^https?:\/\//i.test(s)) return true;
+    if (/^[a-z0-9]([a-z0-9-]*\.)+[a-z]{2,}/i.test(s) && !/\s/.test(s)) return true;
+    return false;
+  }
+  function toUrl(s) {
+    s = s.trim();
+    if (!s) return null;
+    if (isUrl(s)) return s.startsWith('http') ? s : 'https://' + s;
+    return null;
+  }
+  function host(u) {
+    try { return new URL(u).hostname.replace(/^www\./, ''); } catch { return 'صفحه'; }
+  }
+
+  // Storage
+  function load() {
+    try {
+      bookmarks = JSON.parse(localStorage.getItem(SK.bm) || '[]');
+      historyList = JSON.parse(localStorage.getItem(SK.hist) || '[]');
+      const s = localStorage.getItem(SK.set);
+      if (s) settings = Object.assign(settings, JSON.parse(s));
+      if (localStorage.getItem(SK.theme) === 'dark') {
+        settings.dark = true;
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    } catch (e) {}
+  }
+  function saveBm() { localStorage.setItem(SK.bm, JSON.stringify(bookmarks)); }
+  function saveHist() { localStorage.setItem(SK.hist, JSON.stringify(historyList.slice(0, 60))); }
+  function saveSet() { localStorage.setItem(SK.set, JSON.stringify(settings)); }
+
+  // Tabs
+  function createTab(url) {
+    const id = uid();
+    const tab = {
+      id, url: url || null, title: url ? host(url) : 'تب جدید',
+      history: url ? [url] : [], histIdx: url ? 0 : -1,
+      type: url ? 'url' : 'home', query: null
+    };
+    tabs.push(tab);
+    renderTabs();
+    switchTab(id);
+    if (url) openUrl(id, url);
+    else showHome(id);
+    return id;
+  }
+
+  function switchTab(id) {
+    activeId = id;
+    renderTabs();
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const v = document.getElementById('v-' + id);
+    if (v) v.classList.add('active');
+    const tab = tabs.find(t => t.id === id);
+    if (tab) {
+      document.getElementById('urlInput').value = tab.url || tab.query || '';
+      setIcon(tab.url);
+      setNav(tab);
+    }
+  }
+
+  function closeTab(id, e) {
+    if (e) e.stopPropagation();
+    const i = tabs.findIndex(t => t.id === id);
+    if (i < 0) return;
+    const v = document.getElementById('v-' + id);
+    if (v) v.remove();
+    tabs.splice(i, 1);
+    if (!tabs.length) { createTab(); return; }
+    if (activeId === id) switchTab(tabs[Math.max(0, i - 1)].id);
+    else renderTabs();
+  }
+
+  function renderTabs() {
+    const w = document.getElementById('tabsWrap');
+    w.innerHTML = tabs.map(t =>
+      '<div class="tab' + (t.id === activeId ? ' active' : '') + '" data-id="' + t.id + '">' +
+      '<span>' + (t.type === 'home' ? '🏠' : t.type === 'search' ? '🔍' : '🌐') + '</span>' +
+      '<span class="tab-title">' + esc(t.title) + '</span>' +
+      '<button class="tab-x" data-x="' + t.id + '">✕</button></div>'
+    ).join('');
+    w.querySelectorAll('.tab').forEach(el => {
+      el.onclick = (e) => { if (!e.target.classList.contains('tab-x')) switchTab(el.dataset.id); };
+    });
+    w.querySelectorAll('.tab-x').forEach(b => {
+      b.onclick = (e) => closeTab(b.dataset.x, e);
+    });
+  }
+
+  function viewOf(id) {
+    let v = document.getElementById('v-' + id);
+    if (!v) {
+      v = document.createElement('div');
+      v.id = 'v-' + id;
+      v.className = 'view';
+      document.getElementById('content').appendChild(v);
+    }
+    return v;
+  }
+
+  // Home - fast render
+  function showHome(id) {
+    const tab = tabs.find(t => t.id === id);
+    if (!tab) return;
+    tab.type = 'home'; tab.url = null; tab.query = null; tab.title = 'تب جدید';
+    const v = viewOf(id);
+    const links = bookmarks.length
+      ? bookmarks.slice(0, 8).map(b => ({ t: b.title, u: b.url, i: '⭐' }))
+      : QUICK;
+
+    let qhtml = '';
+    links.forEach(l => {
+      qhtml += '<button class="qlink" data-u="' + esc(l.u) + '"><div class="qlink-ico">' + (l.i || '🌐') + '</div><span>' + esc(l.t) + '</span></button>';
+    });
+
+    v.innerHTML =
+      '<div class="home">' +
+      '<div class="logo">خرداد</div>' +
+      '<div class="home-search">' +
+      '<button id="hsb-' + id + '">🔍</button>' +
+      '<input type="text" id="hsi-' + id + '" placeholder="جستجو یا آدرس...">' +
+      '</div>' +
+      '<div class="qlinks">' + qhtml + '</div></div>';
+
+    const inp = document.getElementById('hsi-' + id);
+    inp.onkeydown = (e) => { if (e.key === 'Enter') go(inp.value); };
+    document.getElementById('hsb-' + id).onclick = () => go(inp.value);
+    v.querySelectorAll('.qlink').forEach(b => {
+      b.onclick = () => go(b.dataset.u);
+    });
+
+    if (id === activeId) {
+      document.getElementById('urlInput').value = '';
+      setIcon(null);
+      renderTabs();
+      setNav(tab);
+    }
+  }
+
+  // Search page - NO external API (avoids CORS / network errors)
+  function showSearch(id, q) {
+    const tab = tabs.find(t => t.id === id);
+    if (!tab) return;
+    tab.type = 'search';
+    tab.url = null;
+    tab.query = q;
+    tab.title = q.length > 16 ? q.slice(0, 16) + '…' : q;
+
+    const v = viewOf(id);
+    const eq = encodeURIComponent(q);
+
+    v.innerHTML =
+      '<div class="search-page">' +
+      '<h2>جستجو: «' + esc(q) + '»</h2>' +
+      '<p class="sub">یک موتور جستجو انتخاب کنید</p>' +
+      '<div class="engine-grid">' +
+      '<button class="engine-btn" data-u="https://www.google.com/search?q=' + eq + '"><span>🔍</span> گوگل</button>' +
+      '<button class="engine-btn" data-u="https://duckduckgo.com/?q=' + eq + '"><span>🦆</span> داک‌داک‌گو</button>' +
+      '<button class="engine-btn" data-u="https://www.bing.com/search?q=' + eq + '"><span>🅱️</span> بینگ</button>' +
+      '<button class="engine-btn" data-u="https://search.yahoo.com/search?p=' + eq + '"><span>🔴</span> یاهو</button>' +
+      '<button class="engine-btn" data-u="https://www.startpage.com/sp/search?query=' + eq + '"><span>🔒</span> استارت‌پیج</button>' +
+      '<button class="engine-btn" data-u="https://fa.wikipedia.org/w/index.php?search=' + eq + '"><span>📖</span> ویکی‌پدیا</button>' +
+      '</div>' +
+      '<p class="hint">با زدن روی هر دکمه، صفحهٔ نتایج در تب جدید مرورگر سیستم باز می‌شود.<br>این روش از خطای iframe و مسدود شدن موتورهای جستجو جلوگیری می‌کند.</p>' +
+      '</div>';
+
+    v.querySelectorAll('.engine-btn').forEach(b => {
+      b.onclick = () => window.open(b.dataset.u, '_blank');
+    });
+
+    addHist('search:' + q, 'جستجو: ' + q);
+
+    if (id === activeId) {
+      document.getElementById('urlInput').value = q;
+      setIcon(null);
+      renderTabs();
+      setNav(tab);
+    }
+  }
+
+  // Open URL in iframe
+  function openUrl(id, url, push) {
+    if (push === undefined) push = true;
+    const tab = tabs.find(t => t.id === id);
+    if (!tab) return;
+
+    tab.type = 'url';
+    tab.url = url;
+    tab.query = null;
+    tab.title = host(url);
+
+    if (push) {
+      tab.history = tab.history.slice(0, tab.histIdx + 1);
+      tab.history.push(url);
+      tab.histIdx = tab.history.length - 1;
+    }
+
+    const v = viewOf(id);
+    v.innerHTML = '<iframe class="frame" id="f-' + id + '" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"></iframe>';
+    const f = document.getElementById('f-' + id);
+
+    let ok = false;
+    const tmr = setTimeout(() => { if (!ok) showErr(id, url); }, 8000);
+
+    f.onload = () => {
+      ok = true;
+      clearTimeout(tmr);
+      try {
+        const ti = f.contentDocument && f.contentDocument.title;
+        if (ti) { tab.title = ti.slice(0, 36); renderTabs(); }
+      } catch (e) {}
+    };
+    f.onerror = () => { ok = true; clearTimeout(tmr); showErr(id, url); };
+
+    try { f.src = url; } catch (e) { showErr(id, url); }
+
+    addHist(url, tab.title);
+
+    if (id === activeId) {
+      document.getElementById('urlInput').value = url;
+      setIcon(url);
+      setNav(tab);
+      renderTabs();
+    }
+  }
+
+  function showErr(id, url) {
+    const tab = tabs.find(t => t.id === id);
+    if (tab) { tab.type = 'error'; tab.title = host(url); }
+    const v = viewOf(id);
+    v.innerHTML =
+      '<div class="error-page">' +
+      '<div class="ico">🚫</div>' +
+      '<h2>این سایت داخل مرورگر قابل نمایش نیست</h2>' +
+      '<p>خیلی از سایت‌ها (گوگل، یوتیوب، اینستاگرام و ...) اجازه نمایش در iframe را نمی‌دهند.</p>' +
+      '<p style="direction:ltr;font-size:0.78rem;opacity:0.65;word-break:break-all">' + esc(url) + '</p>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px">' +
+      '<button class="btn btn-p" id="ox-' + id + '">باز کردن در مرورگر سیستم</button>' +
+      '<button class="btn btn-o" id="nt-' + id + '">تب جدید</button>' +
+      '</div></div>';
+    document.getElementById('ox-' + id).onclick = () => window.open(url, '_blank');
+    document.getElementById('nt-' + id).onclick = () => createTab();
+    if (id === activeId) renderTabs();
+  }
+
+  function go(input) {
+    if (!input || !String(input).trim()) return;
+    input = String(input).trim();
+    const u = toUrl(input);
+    if (u) openUrl(activeId, u);
+    else showSearch(activeId, input);
+  }
+
+  function goBack() {
+    const tab = tabs.find(t => t.id === activeId);
+    if (!tab || tab.histIdx <= 0) return;
+    tab.histIdx--;
+    openUrl(activeId, tab.history[tab.histIdx], false);
+  }
+  function goFwd() {
+    const tab = tabs.find(t => t.id === activeId);
+    if (!tab || tab.histIdx >= tab.history.length - 1) return;
+    tab.histIdx++;
+    openUrl(activeId, tab.history[tab.histIdx], false);
+  }
+  function reload() {
+    const tab = tabs.find(t => t.id === activeId);
+    if (!tab) return;
+    if (tab.type === 'url' && tab.url) openUrl(activeId, tab.url, false);
+    else if (tab.type === 'search' && tab.query) showSearch(activeId, tab.query);
+    else showHome(activeId);
+  }
+  function goHome() { showHome(activeId); }
+
+  function setNav(tab) {
+    if (!tab) return;
+    document.getElementById('backBtn').disabled = tab.histIdx <= 0;
+    document.getElementById('forwardBtn').disabled = tab.histIdx >= tab.history.length - 1 || !tab.history.length;
+  }
+  function setIcon(url) {
+    const i = document.getElementById('secIcon');
+    if (!url) { i.textContent = '🔍'; i.style.color = 'var(--text2)'; }
+    else if (url.startsWith('https')) { i.textContent = '🔒'; i.style.color = 'var(--success)'; }
+    else { i.textContent = '⚠️'; i.style.color = 'orange'; }
+  }
+
+  // Bookmarks
+  function addBm(title, url) {
+    if (!url) return;
+    if (bookmarks.some(b => b.url === url)) { toast('قبلاً ذخیره شده'); return; }
+    bookmarks.unshift({ id: uid(), title: title || host(url), url });
+    saveBm();
+    renderBmBar();
+    toast('ذخیره شد ⭐');
+  }
+  function delBm(id) {
+    bookmarks = bookmarks.filter(b => b.id !== id);
+    saveBm();
+    renderBmBar();
+    if (document.getElementById('panel').classList.contains('open')) showBmPanel();
+    toast('حذف شد');
+  }
+  function renderBmBar() {
+    const bar = document.getElementById('bmBar');
+    if (!settings.showBmBar) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    if (!bookmarks.length) {
+      bar.innerHTML = '<span style="font-size:0.72rem;color:var(--text2);padding:2px 6px">نشانکی ندارید</span>';
+      return;
+    }
+    bar.innerHTML = bookmarks.slice(0, 10).map(b =>
+      '<button class="bm-item" data-u="' + esc(b.url) + '"><span>⭐</span> ' + esc(b.title) + '</button>'
+    ).join('');
+    bar.querySelectorAll('.bm-item').forEach(b => { b.onclick = () => go(b.dataset.u); });
+  }
+
+  function addHist(url, title) {
+    historyList = historyList.filter(h => h.url !== url);
+    historyList.unshift({ id: uid(), url, title: title || host(url) });
+    historyList = historyList.slice(0, 60);
+    saveHist();
+  }
+
+  // Panel
+  function openPanel(type) {
+    const p = document.getElementById('panel');
+    const ov = document.getElementById('panelOverlay');
+    p.classList.add('open');
+    ov.style.display = 'block';
+    if (type === 'bm') showBmPanel();
+    else if (type === 'hist') showHistPanel();
+    else showSetPanel();
+  }
+  function closePanel() {
+    document.getElementById('panel').classList.remove('open');
+    document.getElementById('panelOverlay').style.display = 'none';
+  }
+
+  function showBmPanel() {
+    document.getElementById('panelTitle').textContent = 'نشانک‌ها';
+    const body = document.getElementById('panelBody');
+    if (!bookmarks.length) {
+      body.innerHTML = '<div class="empty">هنوز نشانکی ندارید</div>';
+      return;
+    }
+    body.innerHTML = bookmarks.map(b =>
+      '<div class="p-item" data-u="' + esc(b.url) + '">' +
+      '<div class="p-ico">⭐</div>' +
+      '<div class="p-info"><div class="p-title">' + esc(b.title) + '</div>' +
+      '<div class="p-url">' + esc(b.url) + '</div></div>' +
+      '<button data-del="' + b.id + '" style="background:none;border:none;cursor:pointer;font-size:0.95rem">🗑️</button></div>'
+    ).join('');
+    body.querySelectorAll('.p-item').forEach(el => {
+      el.onclick = (e) => {
+        if (e.target.dataset.del) { delBm(e.target.dataset.del); return; }
+        go(el.dataset.u); closePanel();
+      };
+    });
+  }
+
+  function showHistPanel() {
+    document.getElementById('panelTitle').textContent = 'تاریخچه';
+    const body = document.getElementById('panelBody');
+    if (!historyList.length) {
+      body.innerHTML = '<div class="empty">تاریخچه‌ای نیست</div>';
+      return;
+    }
+    body.innerHTML = historyList.map(h =>
+      '<div class="p-item" data-u="' + esc(h.url) + '">' +
+      '<div class="p-ico">🕒</div>' +
+      '<div class="p-info"><div class="p-title">' + esc(h.title) + '</div>' +
+      '<div class="p-url">' + esc(h.url.startsWith('search:') ? h.title : h.url) + '</div></div></div>'
+    ).join('');
+    body.querySelectorAll('.p-item').forEach(el => {
+      el.onclick = () => {
+        const u = el.dataset.u;
+        if (u.startsWith('search:')) showSearch(activeId, u.replace('search:', ''));
+        else go(u);
+        closePanel();
+      };
+    });
+  }
+
+  function showSetPanel() {
+    document.getElementById('panelTitle').textContent = 'تنظیمات';
+    const body = document.getElementById('panelBody');
+    body.innerHTML =
+      '<div class="setting-row"><span>حالت شب</span><div class="toggle' + (settings.dark ? ' on' : '') + '" id="thToggle"></div></div>' +
+      '<div class="setting-row"><span>نوار نشانک‌ها</span><div class="toggle' + (settings.showBmBar ? ' on' : '') + '" id="bmToggle"></div></div>' +
+      '<div style="padding:14px 8px"><button class="btn btn-o" style="width:100%;color:var(--danger);border-color:var(--danger)" id="clrBtn">🗑️ پاک کردن داده‌ها</button></div>' +
+      '<p style="text-align:center;font-size:0.72rem;color:var(--text2);padding:6px">خرداد مرورگر</p>';
+
+    document.getElementById('thToggle').onclick = function () {
+      settings.dark = !settings.dark;
+      this.classList.toggle('on', settings.dark);
+      if (settings.dark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem(SK.theme, 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem(SK.theme, 'light');
+      }
+      saveSet();
+    };
+    document.getElementById('bmToggle').onclick = function () {
+      settings.showBmBar = !settings.showBmBar;
+      this.classList.toggle('on', settings.showBmBar);
+      saveSet();
+      renderBmBar();
+    };
+    document.getElementById('clrBtn').onclick = () => {
+      if (confirm('همه نشانک‌ها و تاریخچه پاک شود؟')) {
+        bookmarks = []; historyList = [];
+        saveBm(); saveHist();
+        renderBmBar();
+        toast('پاک شد');
+      }
+    };
+  }
+
+  function toggleTheme() {
+    settings.dark = !settings.dark;
+    if (settings.dark) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem(SK.theme, 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem(SK.theme, 'light');
+    }
+    saveSet();
+  }
+
+  // Events
+  function bind() {
+    document.getElementById('newTabBtn').onclick = () => createTab();
+    document.getElementById('backBtn').onclick = goBack;
+    document.getElementById('forwardBtn').onclick = goFwd;
+    document.getElementById('reloadBtn').onclick = reload;
+    document.getElementById('homeBtn').onclick = goHome;
+
+    const ui = document.getElementById('urlInput');
+    ui.onkeydown = (e) => { if (e.key === 'Enter') go(ui.value); };
+    ui.oninput = () => {
+      document.getElementById('clearBtn').style.display = ui.value ? 'block' : 'none';
+    };
+    document.getElementById('clearBtn').onclick = () => {
+      ui.value = ''; document.getElementById('clearBtn').style.display = 'none'; ui.focus();
+    };
+    document.getElementById('goBtn').onclick = () => go(ui.value);
+
+    document.getElementById('bmBtn').onclick = () => {
+      const tab = tabs.find(t => t.id === activeId);
+      if (tab && tab.url) {
+        document.getElementById('bmName').value = tab.title;
+        document.getElementById('bmUrl').value = tab.url;
+        document.getElementById('bmModal').classList.add('show');
+      } else toast('ابتدا یک صفحه باز کنید');
+    };
+    document.getElementById('bmSave').onclick = () => {
+      const name = document.getElementById('bmName').value.trim();
+      let url = document.getElementById('bmUrl').value.trim();
+      if (url) {
+        if (!url.startsWith('http')) url = 'https://' + url;
+        addBm(name || host(url), url);
+        document.getElementById('bmModal').classList.remove('show');
+      }
+    };
+    document.getElementById('bmCancel').onclick = () => document.getElementById('bmModal').classList.remove('show');
+    document.getElementById('bmModal').onclick = (e) => {
+      if (e.target.id === 'bmModal') document.getElementById('bmModal').classList.remove('show');
+    };
+
+    document.getElementById('bmPanelBtn').onclick = () => openPanel('bm');
+    document.getElementById('histBtn').onclick = () => openPanel('hist');
+    document.getElementById('menuBtn').onclick = () => openPanel('set');
+    document.getElementById('closePanel').onclick = closePanel;
+    document.getElementById('panelOverlay').onclick = closePanel;
+
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 't') { e.preventDefault(); createTab(); }
+        else if (e.key === 'w') { e.preventDefault(); if (activeId) closeTab(activeId); }
+        else if (e.key === 'l') { e.preventDefault(); ui.focus(); ui.select(); }
+      }
+      if (e.key === 'Escape') closePanel();
+    });
+  }
+
+  // Init - critical: panel must start closed
+  function init() {
+    load();
+    // Force panel closed on every load
+    document.getElementById('panel').classList.remove('open');
+    document.getElementById('panelOverlay').style.display = 'none';
+    bind();
+    renderBmBar();
+    createTab();
+  }
+
+  // Run as soon as possible
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+</body>
+</html>

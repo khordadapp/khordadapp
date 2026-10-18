@@ -1,0 +1,1664 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>خرداد مپ | مسیریاب حرفه‌ای</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --primary-hover: #1557b0;
+            --primary-light: #e8f0fe;
+            --bg: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-sidebar: #ffffff;
+            --text: #202124;
+            --text-secondary: #5f6368;
+            --border: #dadce0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --danger: #d93025;
+            --success: #188038;
+            --warning: #f9ab00;
+            --transition: all 0.2s ease;
+        }
+
+        [data-theme="dark"] {
+            --primary: #8ab4f8;
+            --primary-hover: #aecbfa;
+            --primary-light: #1e3a5f;
+            --bg: #202124;
+            --bg-secondary: #303134;
+            --bg-sidebar: #292a2d;
+            --text: #e8eaed;
+            --text-secondary: #9aa0a6;
+            --border: #3c4043;
+            --shadow: 0 1px 3px rgba(0,0,0,0.4);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ===== Header / Search ===== */
+        .top-bar {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            left: 16px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            max-width: 480px;
+        }
+
+        .search-container {
+            flex: 1;
+            background: var(--bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .search-container input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 14px 16px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background: transparent;
+            color: var(--text);
+        }
+
+        .search-container input::placeholder { color: var(--text-secondary); }
+
+        .search-btn, .clear-btn {
+            background: none;
+            border: none;
+            padding: 12px 14px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+
+        .search-btn:hover, .clear-btn:hover { color: var(--primary); }
+
+        .menu-btn {
+            width: 48px;
+            height: 48px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.3rem;
+            color: var(--text);
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .menu-btn:hover { background: var(--bg-secondary); }
+
+        /* ===== Search Results ===== */
+        .search-results {
+            position: absolute;
+            top: 70px;
+            right: 16px;
+            left: 16px;
+            max-width: 480px;
+            background: var(--bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            max-height: 360px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            border: 1px solid var(--border);
+        }
+
+        .search-results.active { display: block; }
+
+        .result-item {
+            padding: 14px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .result-item:last-child { border-bottom: none; }
+        .result-item:hover { background: var(--bg-secondary); }
+
+        .result-icon { font-size: 1.2rem; margin-top: 2px; }
+        .result-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .result-address { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4; }
+
+        /* ===== Sidebar ===== */
+        .sidebar {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 360px;
+            height: 100%;
+            background: var(--bg-sidebar);
+            box-shadow: var(--shadow-lg);
+            z-index: 1100;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--border);
+        }
+
+        .sidebar.open { transform: translateX(0); }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover { background: var(--bg-secondary); }
+
+        .sidebar-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+
+        .sidebar-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Directions Panel */
+        .route-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .route-input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            padding: 4px 12px;
+            border: 1px solid var(--border);
+        }
+
+        .route-input-group .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .route-input-group .dot.start { background: var(--success); }
+        .route-input-group .dot.end { background: var(--danger); }
+
+        .route-input-group input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 0;
+            font-family: inherit;
+            font-size: 0.9rem;
+            color: var(--text);
+            outline: none;
+        }
+
+        .route-modes {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--bg);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.85rem;
+            color: var(--text);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mode-btn.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .mode-btn span { font-size: 1.3rem; }
+
+        .route-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .route-btn:hover { background: var(--primary-hover); }
+        .route-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .route-info {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-sm);
+            display: none;
+        }
+
+        .route-info.active { display: block; }
+
+        .route-info-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .route-distance {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .route-duration {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        .route-steps {
+            max-height: 240px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+
+        .route-step {
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            gap: 10px;
+        }
+
+        .route-step:last-child { border-bottom: none; }
+
+        /* Favorites & Recent */
+        .place-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 6px;
+        }
+
+        .place-item:hover { background: var(--bg-secondary); }
+
+        .place-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .place-info { flex: 1; min-width: 0; }
+        .place-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .place-address { font-size: 0.75rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .place-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .place-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 6px;
+            border-radius: 50%;
+            color: var(--text-secondary);
+        }
+
+        .place-actions button:hover { background: var(--bg); color: var(--danger); }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
+
+        /* Settings */
+        .setting-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .setting-item:last-child { border-bottom: none; }
+
+        .setting-label { font-size: 0.95rem; }
+
+        .toggle {
+            width: 48px;
+            height: 26px;
+            background: var(--border);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle.active { background: var(--primary); }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            right: 3px;
+            transition: var(--transition);
+        }
+
+        .toggle.active::after { right: 25px; }
+
+        /* ===== Map Controls ===== */
+        .map-controls {
+            position: absolute;
+            bottom: 24px;
+            left: 16px;
+            z-index: 900;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 44px;
+            height: 44px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .control-btn:hover { background: var(--bg-secondary); transform: scale(1.05); }
+        .control-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Layer Switcher */
+        .layer-panel {
+            position: absolute;
+            bottom: 24px;
+            right: 16px;
+            z-index: 900;
+            background: var(--bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 8px;
+            display: none;
+            border: 1px solid var(--border);
+        }
+
+        .layer-panel.active { display: block; }
+
+        .layer-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        .layer-option:hover { background: var(--bg-secondary); }
+        .layer-option.active { background: var(--primary-light); color: var(--primary); font-weight: 600; }
+
+        /* ===== Context Menu / Popup ===== */
+        .custom-popup .leaflet-popup-content-wrapper {
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            font-family: 'Vazirmatn', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .custom-popup .leaflet-popup-tip { background: var(--bg); }
+
+        .popup-content { min-width: 180px; }
+        .popup-title { font-weight: 700; margin-bottom: 6px; font-size: 0.95rem; }
+        .popup-coords { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 10px; direction: ltr; text-align: left; }
+        .popup-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+        .popup-btn {
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--bg-secondary);
+            font-family: inherit;
+            font-size: 0.8rem;
+            cursor: pointer;
+            color: var(--text);
+            transition: var(--transition);
+        }
+
+        .popup-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+        /* ===== Measure Tool ===== */
+        .measure-info {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg);
+            padding: 10px 18px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            z-index: 950;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+            border: 1px solid var(--border);
+        }
+
+        .measure-info.active { display: block; }
+
+        /* ===== Toast ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .toast {
+            background: var(--bg);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: toastIn 0.3s ease;
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== Loading ===== */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.3);
+            z-index: 1500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay.active { display: flex; }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===== Leaflet Overrides ===== */
+        .leaflet-control-zoom {
+            border: none !important;
+            box-shadow: var(--shadow) !important;
+            border-radius: var(--radius-sm) !important;
+            overflow: hidden;
+        }
+
+        .leaflet-control-zoom a {
+            background: var(--bg) !important;
+            color: var(--text) !important;
+            border-bottom-color: var(--border) !important;
+            width: 36px !important;
+            height: 36px !important;
+            line-height: 36px !important;
+            font-size: 18px !important;
+        }
+
+        .leaflet-control-zoom a:hover { background: var(--bg-secondary) !important; }
+
+        .leaflet-control-attribution {
+            background: rgba(255,255,255,0.8) !important;
+            font-size: 10px !important;
+            direction: ltr;
+        }
+
+        [data-theme="dark"] .leaflet-control-attribution {
+            background: rgba(32,33,36,0.85) !important;
+            color: #9aa0a6 !important;
+        }
+
+        .leaflet-routing-container {
+            display: none !important;
+        }
+
+        /* Custom Markers */
+        .user-marker {
+            background: var(--primary);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .start-marker, .end-marker {
+            width: 28px !important;
+            height: 28px !important;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .start-marker { background: var(--success); }
+        .end-marker { background: var(--danger); }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .sidebar { width: 100%; }
+            .top-bar { right: 10px; left: 10px; }
+            .search-results { right: 10px; left: 10px; }
+            .map-controls { bottom: 16px; left: 10px; }
+            .layer-panel { right: 10px; bottom: 16px; }
+        }
+
+        /* Brand Logo */
+        .brand {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 800;
+            background: var(--bg);
+            padding: 6px 14px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--border);
+            pointer-events: none;
+        }
+
+        @media (max-width: 600px) {
+            .brand { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Map -->
+    <div id="map" style="width:100%;height:100%;"></div>
+
+    <!-- Top Search Bar -->
+    <div class="top-bar">
+        <button class="menu-btn" id="menuBtn" title="منو">☰</button>
+        <div class="search-container">
+            <button class="search-btn" id="searchBtn">🔍</button>
+            <input type="text" id="searchInput" placeholder="جستجوی مکان، آدرس یا مختصات..." autocomplete="off">
+            <button class="clear-btn" id="clearSearch" style="display:none;">✕</button>
+        </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results" id="searchResults"></div>
+
+    <!-- Measure Info -->
+    <div class="measure-info" id="measureInfo">فاصله: ۰ متر</div>
+
+    <!-- Brand -->
+    <div class="brand">
+        <span>📍</span> خرداد مپ
+    </div>
+
+    <!-- Map Controls -->
+    <div class="map-controls">
+        <button class="control-btn" id="locateBtn" title="موقعیت من">📍</button>
+        <button class="control-btn" id="layersBtn" title="لایه‌های نقشه">🗺️</button>
+        <button class="control-btn" id="measureBtn" title="اندازه‌گیری فاصله">📏</button>
+        <button class="control-btn" id="themeBtn" title="حالت روز/شب">🌙</button>
+    </div>
+
+    <!-- Layer Panel -->
+    <div class="layer-panel" id="layerPanel">
+        <div class="layer-option active" data-layer="streets">🛣️ خیابان‌ها</div>
+        <div class="layer-option" data-layer="satellite">🛰️ ماهواره</div>
+        <div class="layer-option" data-layer="terrain">🏔️ توپوگرافی</div>
+        <div class="layer-option" data-layer="dark">🌑 تیره</div>
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><span>📍</span> خرداد مپ</h2>
+            <button class="sidebar-close" id="sidebarClose">✕</button>
+        </div>
+        <div class="sidebar-tabs">
+            <button class="sidebar-tab active" data-tab="directions">مسیریابی</button>
+            <button class="sidebar-tab" data-tab="favorites">علاقه‌مندی‌ها</button>
+            <button class="sidebar-tab" data-tab="recent">اخیر</button>
+            <button class="sidebar-tab" data-tab="settings">تنظیمات</button>
+        </div>
+        <div class="sidebar-content">
+            <!-- Directions Tab -->
+            <div class="tab-panel active" id="tab-directions">
+                <div class="route-inputs">
+                    <div class="route-input-group">
+                        <div class="dot start"></div>
+                        <input type="text" id="startInput" placeholder="مبدأ (یا موقعیت فعلی)">
+                    </div>
+                    <div class="route-input-group">
+                        <div class="dot end"></div>
+                        <input type="text" id="endInput" placeholder="مقصد">
+                    </div>
+                </div>
+                <div class="route-modes">
+                    <button class="mode-btn active" data-mode="driving">
+                        <span>🚗</span>
+                        ماشین
+                    </button>
+                    <button class="mode-btn" data-mode="walking">
+                        <span>🚶</span>
+                        پیاده
+                    </button>
+                    <button class="mode-btn" data-mode="cycling">
+                        <span>🚴</span>
+                        دوچرخه
+                    </button>
+                </div>
+                <button class="route-btn" id="routeBtn">محاسبه مسیر</button>
+                <div class="route-info" id="routeInfo">
+                    <div class="route-info-header">
+                        <div>
+                            <div class="route-distance" id="routeDistance">—</div>
+                            <div class="route-duration" id="routeDuration">—</div>
+                        </div>
+                        <button class="popup-btn" id="clearRouteBtn">پاک کردن</button>
+                    </div>
+                    <div class="route-steps" id="routeSteps"></div>
+                </div>
+            </div>
+
+            <!-- Favorites Tab -->
+            <div class="tab-panel" id="tab-favorites">
+                <div id="favoritesList"></div>
+            </div>
+
+            <!-- Recent Tab -->
+            <div class="tab-panel" id="tab-recent">
+                <div id="recentList"></div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div class="tab-panel" id="tab-settings">
+                <div class="setting-item">
+                    <span class="setting-label">حالت شب</span>
+                    <div class="toggle" id="themeToggle"></div>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">نمایش مقیاس</span>
+                    <div class="toggle active" id="scaleToggle"></div>
+                </div>
+                <div class="setting-item">
+                    <span class="setting-label">ذخیره خودکار جستجوها</span>
+                    <div class="toggle active" id="saveSearchToggle"></div>
+                </div>
+                <div style="margin-top: 24px;">
+                    <button class="route-btn" id="exportDataBtn" style="background: var(--success); margin-bottom: 10px;">
+                        ⬇️ بکاپ داده‌ها
+                    </button>
+                    <button class="route-btn" id="clearDataBtn" style="background: var(--danger);">
+                        🗑️ پاک کردن همه داده‌ها
+                    </button>
+                    <input type="file" id="importDataInput" accept=".json" style="display:none;">
+                    <button class="route-btn" id="importDataBtn" style="background: var(--text-secondary); margin-top: 10px;">
+                        ⬆️ بازیابی بکاپ
+                    </button>
+                </div>
+                <p style="margin-top: 20px; font-size: 0.8rem; color: var(--text-secondary); text-align: center;">
+                    نسخه ۱.۰ • خرداد مپ<br>
+                    داده‌ها فقط روی دستگاه شما ذخیره می‌شوند
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Loading -->
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+    <script>
+        // ==================== Storage Keys ====================
+        const STORAGE = {
+            favorites: 'khordad_map_favorites',
+            recent: 'khordad_map_recent',
+            settings: 'khordad_map_settings',
+            theme: 'khordad_map_theme'
+        };
+
+        // ==================== State ====================
+        let map, currentLayer, userMarker, routingControl = null;
+        let measureMode = false;
+        let measurePoints = [];
+        let measureLine = null;
+        let measureMarkers = [];
+        let startMarker = null, endMarker = null;
+        let startCoords = null, endCoords = null;
+        let currentMode = 'driving';
+        let favorites = [];
+        let recentSearches = [];
+        let settings = {
+            darkMode: false,
+            showScale: true,
+            saveSearches: true
+        };
+        let searchTimeout = null;
+        let scaleControl = null;
+
+        // ==================== Tile Layers ====================
+        const layers = {
+            streets: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri',
+                maxZoom: 19
+            }),
+            terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenTopoMap',
+                maxZoom: 17
+            }),
+            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© CartoDB',
+                maxZoom: 19
+            })
+        };
+
+        // ==================== Utilities ====================
+        function showToast(msg, duration = 2500) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(20px)';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('active', show);
+        }
+
+        function toPersianNum(n) {
+            return String(n).replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+        }
+
+        function formatDistance(meters) {
+            if (meters < 1000) return toPersianNum(Math.round(meters)) + ' متر';
+            return toPersianNum((meters / 1000).toFixed(1)) + ' کیلومتر';
+        }
+
+        function formatDuration(seconds) {
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            if (h > 0) return toPersianNum(h) + ' ساعت و ' + toPersianNum(m) + ' دقیقه';
+            return toPersianNum(m) + ' دقیقه';
+        }
+
+        // ==================== Storage ====================
+        function loadData() {
+            try {
+                favorites = JSON.parse(localStorage.getItem(STORAGE.favorites) || '[]');
+                recentSearches = JSON.parse(localStorage.getItem(STORAGE.recent) || '[]');
+                const s = localStorage.getItem(STORAGE.settings);
+                if (s) settings = { ...settings, ...JSON.parse(s) };
+                const theme = localStorage.getItem(STORAGE.theme);
+                if (theme === 'dark') {
+                    settings.darkMode = true;
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.getElementById('themeBtn').textContent = '☀️';
+                    document.getElementById('themeToggle').classList.add('active');
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function saveFavorites() {
+            localStorage.setItem(STORAGE.favorites, JSON.stringify(favorites));
+        }
+
+        function saveRecent() {
+            localStorage.setItem(STORAGE.recent, JSON.stringify(recentSearches.slice(0, 20)));
+        }
+
+        function saveSettings() {
+            localStorage.setItem(STORAGE.settings, JSON.stringify(settings));
+        }
+
+        // ==================== Map Init ====================
+        function initMap() {
+            map = L.map('map', {
+                center: [35.6892, 51.3890], // Tehran
+                zoom: 12,
+                zoomControl: true
+            });
+
+            currentLayer = layers.streets;
+            currentLayer.addTo(map);
+
+            // Scale
+            scaleControl = L.control.scale({ imperial: false, position: 'bottomleft' });
+            if (settings.showScale) scaleControl.addTo(map);
+
+            // Click to place marker / measure
+            map.on('click', onMapClick);
+
+            // Right click context (simple popup)
+            map.on('contextmenu', (e) => {
+                L.popup({ className: 'custom-popup' })
+                    .setLatLng(e.latlng)
+                    .setContent(createPopupContent(e.latlng, 'موقعیت انتخاب‌شده'))
+                    .openOn(map);
+            });
+        }
+
+        function onMapClick(e) {
+            if (measureMode) {
+                addMeasurePoint(e.latlng);
+                return;
+            }
+            // Optional: place temporary marker
+        }
+
+        // ==================== Search ====================
+        async function searchPlaces(query) {
+            if (!query || query.length < 2) {
+                document.getElementById('searchResults').classList.remove('active');
+                return;
+            }
+
+            try {
+                const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=8&addressdetails=1&accept-language=fa`;
+                const res = await fetch(url, {
+                    headers: { 'Accept-Language': 'fa' }
+                });
+                const data = await res.json();
+                renderSearchResults(data);
+            } catch (err) {
+                showToast('خطا در جستجو');
+                console.error(err);
+            }
+        }
+
+        function renderSearchResults(results) {
+            const container = document.getElementById('searchResults');
+            if (!results.length) {
+                container.innerHTML = '<div class="result-item"><div class="result-title">نتیجه‌ای یافت نشد</div></div>';
+                container.classList.add('active');
+                return;
+            }
+
+            container.innerHTML = results.map(r => `
+                <div class="result-item" data-lat="${r.lat}" data-lon="${r.lon}" data-name="${escapeHtml(r.display_name.split(',')[0])}" data-full="${escapeHtml(r.display_name)}">
+                    <div class="result-icon">📍</div>
+                    <div>
+                        <div class="result-title">${escapeHtml(r.display_name.split(',')[0])}</div>
+                        <div class="result-address">${escapeHtml(r.display_name)}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            container.classList.add('active');
+
+            container.querySelectorAll('.result-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const lat = parseFloat(el.dataset.lat);
+                    const lon = parseFloat(el.dataset.lon);
+                    const name = el.dataset.name;
+                    const full = el.dataset.full;
+                    goToLocation(lat, lon, name, full);
+                    document.getElementById('searchInput').value = name;
+                    container.classList.remove('active');
+                    document.getElementById('clearSearch').style.display = 'block';
+                });
+            });
+        }
+
+        function escapeHtml(text) {
+            const d = document.createElement('div');
+            d.textContent = text;
+            return d.innerHTML;
+        }
+
+        function goToLocation(lat, lon, name, fullAddress) {
+            map.setView([lat, lon], 15);
+            L.popup({ className: 'custom-popup' })
+                .setLatLng([lat, lon])
+                .setContent(createPopupContent({ lat, lng: lon }, name || 'موقعیت', fullAddress))
+                .openOn(map);
+
+            if (settings.saveSearches) {
+                addToRecent({ lat, lon, name, address: fullAddress || name });
+            }
+        }
+
+        function createPopupContent(latlng, title, address) {
+            const lat = latlng.lat.toFixed(6);
+            const lng = latlng.lng.toFixed(6);
+            return `
+                <div class="popup-content">
+                    <div class="popup-title">${title || 'موقعیت'}</div>
+                    ${address ? `<div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:6px;">${address}</div>` : ''}
+                    <div class="popup-coords">${lat}, ${lng}</div>
+                    <div class="popup-actions">
+                        <button class="popup-btn" onclick="setAsStart(${latlng.lat}, ${latlng.lng}, '${(title || '').replace(/'/g, "\\'")}')">مبدأ</button>
+                        <button class="popup-btn" onclick="setAsEnd(${latlng.lat}, ${latlng.lng}, '${(title || '').replace(/'/g, "\\'")}')">مقصد</button>
+                        <button class="popup-btn" onclick="addFavorite(${latlng.lat}, ${latlng.lng}, '${(title || 'موقعیت ذخیره‌شده').replace(/'/g, "\\'")}')">⭐ ذخیره</button>
+                        <button class="popup-btn" onclick="copyCoords(${latlng.lat}, ${latlng.lng})">📋 کپی</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== Global functions for popup buttons ====================
+        window.setAsStart = function(lat, lng, name) {
+            startCoords = { lat, lng };
+            document.getElementById('startInput').value = name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            if (startMarker) map.removeLayer(startMarker);
+            startMarker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: '',
+                    html: '<div class="start-marker"></div>',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 28]
+                })
+            }).addTo(map);
+            map.closePopup();
+            showToast('مبدأ تنظیم شد');
+            document.getElementById('sidebar').classList.add('open');
+            switchTab('directions');
+        };
+
+        window.setAsEnd = function(lat, lng, name) {
+            endCoords = { lat, lng };
+            document.getElementById('endInput').value = name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+            if (endMarker) map.removeLayer(endMarker);
+            endMarker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: '',
+                    html: '<div class="end-marker"></div>',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 28]
+                })
+            }).addTo(map);
+            map.closePopup();
+            showToast('مقصد تنظیم شد');
+            document.getElementById('sidebar').classList.add('open');
+            switchTab('directions');
+        };
+
+        window.addFavorite = function(lat, lng, name) {
+            const exists = favorites.find(f => Math.abs(f.lat - lat) < 0.0001 && Math.abs(f.lon - lng) < 0.0001);
+            if (exists) {
+                showToast('این مکان قبلاً ذخیره شده');
+                return;
+            }
+            favorites.unshift({
+                id: Date.now().toString(36),
+                lat, lon: lng,
+                name: name || 'موقعیت ذخیره‌شده',
+                address: '',
+                addedAt: Date.now()
+            });
+            saveFavorites();
+            renderFavorites();
+            showToast('به علاقه‌مندی‌ها اضافه شد ⭐');
+            map.closePopup();
+        };
+
+        window.copyCoords = function(lat, lng) {
+            navigator.clipboard.writeText(`${lat.toFixed(6)}, ${lng.toFixed(6)}`).then(() => {
+                showToast('مختصات کپی شد');
+            }).catch(() => showToast('خطا در کپی'));
+            map.closePopup();
+        };
+
+        // ==================== Routing ====================
+        async function calculateRoute() {
+            if (!startCoords || !endCoords) {
+                // Try to geocode inputs
+                const startVal = document.getElementById('startInput').value.trim();
+                const endVal = document.getElementById('endInput').value.trim();
+
+                if (!startVal || !endVal) {
+                    showToast('مبدأ و مقصد را وارد کنید');
+                    return;
+                }
+
+                showLoading(true);
+                try {
+                    if (!startCoords) {
+                        const s = await geocode(startVal);
+                        if (!s) throw new Error('مبدأ یافت نشد');
+                        startCoords = { lat: parseFloat(s.lat), lng: parseFloat(s.lon) };
+                        if (startMarker) map.removeLayer(startMarker);
+                        startMarker = L.marker([startCoords.lat, startCoords.lng], {
+                            icon: L.divIcon({ className: '', html: '<div class="start-marker"></div>', iconSize: [28, 28], iconAnchor: [14, 28] })
+                        }).addTo(map);
+                    }
+                    if (!endCoords) {
+                        const e = await geocode(endVal);
+                        if (!e) throw new Error('مقصد یافت نشد');
+                        endCoords = { lat: parseFloat(e.lat), lng: parseFloat(e.lon) };
+                        if (endMarker) map.removeLayer(endMarker);
+                        endMarker = L.marker([endCoords.lat, endCoords.lng], {
+                            icon: L.divIcon({ className: '', html: '<div class="end-marker"></div>', iconSize: [28, 28], iconAnchor: [14, 28] })
+                        }).addTo(map);
+                    }
+                } catch (err) {
+                    showLoading(false);
+                    showToast(err.message || 'خطا در پیدا کردن مکان');
+                    return;
+                }
+            }
+
+            showLoading(true);
+
+            // Profile mapping for OSRM
+            const profile = currentMode === 'driving' ? 'driving' : currentMode === 'cycling' ? 'cycling' : 'foot';
+
+            try {
+                const url = `https://router.project-osrm.org/route/v1/${profile}/${startCoords.lng},${startCoords.lat};${endCoords.lng},${endCoords.lat}?overview=full&geometries=geojson&steps=true`;
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.code !== 'Ok' || !data.routes.length) {
+                    throw new Error('مسیر یافت نشد');
+                }
+
+                const route = data.routes[0];
+
+                // Clear previous route
+                if (routingControl) {
+                    map.removeLayer(routingControl);
+                }
+
+                // Draw route
+                const coords = route.geometry.coordinates.map(c => [c[1], c[0]]);
+                routingControl = L.polyline(coords, {
+                    color: '#1a73e8',
+                    weight: 6,
+                    opacity: 0.85,
+                    lineJoin: 'round'
+                }).addTo(map);
+
+                map.fitBounds(routingControl.getBounds(), { padding: [60, 60] });
+
+                // Show info
+                document.getElementById('routeDistance').textContent = formatDistance(route.distance);
+                document.getElementById('routeDuration').textContent = formatDuration(route.duration);
+                
+                const stepsHtml = route.legs[0].steps.slice(0, 15).map((step, i) => {
+                    const dist = formatDistance(step.distance);
+                    const name = step.name || step.maneuver.type || 'ادامه مسیر';
+                    return `<div class="route-step"><span>${toPersianNum(i + 1)}.</span><span>${name} — ${dist}</span></div>`;
+                }).join('');
+                document.getElementById('routeSteps').innerHTML = stepsHtml || '<div class="route-step">مسیر مستقیم</div>';
+                document.getElementById('routeInfo').classList.add('active');
+
+                showToast('مسیر محاسبه شد');
+            } catch (err) {
+                showToast(err.message || 'خطا در محاسبه مسیر');
+                console.error(err);
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        async function geocode(query) {
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&accept-language=fa`;
+            const res = await fetch(url);
+            const data = await res.json();
+            return data[0] || null;
+        }
+
+        function clearRoute() {
+            if (routingControl) {
+                map.removeLayer(routingControl);
+                routingControl = null;
+            }
+            if (startMarker) { map.removeLayer(startMarker); startMarker = null; }
+            if (endMarker) { map.removeLayer(endMarker); endMarker = null; }
+            startCoords = null;
+            endCoords = null;
+            document.getElementById('startInput').value = '';
+            document.getElementById('endInput').value = '';
+            document.getElementById('routeInfo').classList.remove('active');
+            showToast('مسیر پاک شد');
+        }
+
+        // ==================== Geolocation ====================
+        function locateUser() {
+            if (!navigator.geolocation) {
+                showToast('موقعیت‌یابی پشتیبانی نمی‌شود');
+                return;
+            }
+            showLoading(true);
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const { latitude, longitude } = pos.coords;
+                    map.setView([latitude, longitude], 16);
+                    if (userMarker) map.removeLayer(userMarker);
+                    userMarker = L.circleMarker([latitude, longitude], {
+                        radius: 10,
+                        fillColor: '#1a73e8',
+                        color: '#fff',
+                        weight: 3,
+                        opacity: 1,
+                        fillOpacity: 1
+                    }).addTo(map);
+                    userMarker.bindPopup('موقعیت شما').openPopup();
+                    showLoading(false);
+                    showToast('موقعیت شما پیدا شد');
+                },
+                (err) => {
+                    showLoading(false);
+                    showToast('دسترسی به موقعیت ممکن نیست');
+                    console.error(err);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        // ==================== Measure Tool ====================
+        function toggleMeasure() {
+            measureMode = !measureMode;
+            document.getElementById('measureBtn').classList.toggle('active', measureMode);
+            document.getElementById('measureInfo').classList.toggle('active', measureMode);
+
+            if (!measureMode) {
+                clearMeasure();
+            } else {
+                showToast('روی نقشه کلیک کنید تا فاصله اندازه‌گیری شود');
+            }
+        }
+
+        function addMeasurePoint(latlng) {
+            measurePoints.push(latlng);
+            const marker = L.circleMarker(latlng, {
+                radius: 6,
+                fillColor: '#f9ab00',
+                color: '#fff',
+                weight: 2,
+                fillOpacity: 1
+            }).addTo(map);
+            measureMarkers.push(marker);
+
+            if (measurePoints.length >= 2) {
+                if (measureLine) map.removeLayer(measureLine);
+                measureLine = L.polyline(measurePoints, {
+                    color: '#f9ab00',
+                    weight: 3,
+                    dashArray: '8, 8'
+                }).addTo(map);
+
+                let total = 0;
+                for (let i = 1; i < measurePoints.length; i++) {
+                    total += map.distance(measurePoints[i - 1], measurePoints[i]);
+                }
+                document.getElementById('measureInfo').textContent = 'فاصله: ' + formatDistance(total);
+            }
+        }
+
+        function clearMeasure() {
+            measurePoints = [];
+            measureMarkers.forEach(m => map.removeLayer(m));
+            measureMarkers = [];
+            if (measureLine) { map.removeLayer(measureLine); measureLine = null; }
+            document.getElementById('measureInfo').textContent = 'فاصله: ۰ متر';
+        }
+
+        // ==================== Favorites & Recent ====================
+        function addToRecent(place) {
+            recentSearches = recentSearches.filter(r => !(Math.abs(r.lat - place.lat) < 0.0001 && Math.abs(r.lon - place.lon) < 0.0001));
+            recentSearches.unshift({
+                ...place,
+                id: Date.now().toString(36),
+                time: Date.now()
+            });
+            recentSearches = recentSearches.slice(0, 20);
+            saveRecent();
+            renderRecent();
+        }
+
+        function renderFavorites() {
+            const list = document.getElementById('favoritesList');
+            if (!favorites.length) {
+                list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⭐</div><p>هنوز مکانی ذخیره نکرده‌اید</p></div>`;
+                return;
+            }
+            list.innerHTML = favorites.map(f => `
+                <div class="place-item" data-lat="${f.lat}" data-lon="${f.lon}">
+                    <div class="place-icon">⭐</div>
+                    <div class="place-info">
+                        <div class="place-name">${escapeHtml(f.name)}</div>
+                        <div class="place-address">${f.address || `${f.lat.toFixed(4)}, ${f.lon.toFixed(4)}`}</div>
+                    </div>
+                    <div class="place-actions">
+                        <button onclick="event.stopPropagation(); removeFavorite('${f.id}')" title="حذف">🗑️</button>
+                    </div>
+                </div>
+            `).join('');
+
+            list.querySelectorAll('.place-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    goToLocation(parseFloat(el.dataset.lat), parseFloat(el.dataset.lon), el.querySelector('.place-name').textContent);
+                    document.getElementById('sidebar').classList.remove('open');
+                });
+            });
+        }
+
+        window.removeFavorite = function(id) {
+            favorites = favorites.filter(f => f.id !== id);
+            saveFavorites();
+            renderFavorites();
+            showToast('حذف شد');
+        };
+
+        function renderRecent() {
+            const list = document.getElementById('recentList');
+            if (!recentSearches.length) {
+                list.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🕒</div><p>تاریخچه‌ای وجود ندارد</p></div>`;
+                return;
+            }
+            list.innerHTML = recentSearches.map(r => `
+                <div class="place-item" data-lat="${r.lat}" data-lon="${r.lon}">
+                    <div class="place-icon">🕒</div>
+                    <div class="place-info">
+                        <div class="place-name">${escapeHtml(r.name)}</div>
+                        <div class="place-address">${r.address || ''}</div>
+                    </div>
+                </div>
+            `).join('');
+
+            list.querySelectorAll('.place-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    goToLocation(parseFloat(el.dataset.lat), parseFloat(el.dataset.lon), el.querySelector('.place-name').textContent);
+                    document.getElementById('sidebar').classList.remove('open');
+                });
+            });
+        }
+
+        // ==================== Layers ====================
+        function switchLayer(name) {
+            if (currentLayer) map.removeLayer(currentLayer);
+            currentLayer = layers[name];
+            currentLayer.addTo(map);
+            document.querySelectorAll('.layer-option').forEach(el => {
+                el.classList.toggle('active', el.dataset.layer === name);
+            });
+            document.getElementById('layerPanel').classList.remove('active');
+        }
+
+        // ==================== Theme ====================
+        function toggleTheme() {
+            settings.darkMode = !settings.darkMode;
+            if (settings.darkMode) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                document.getElementById('themeBtn').textContent = '☀️';
+                document.getElementById('themeToggle').classList.add('active');
+                localStorage.setItem(STORAGE.theme, 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+                document.getElementById('themeBtn').textContent = '🌙';
+                document.getElementById('themeToggle').classList.remove('active');
+                localStorage.setItem(STORAGE.theme, 'light');
+            }
+            saveSettings();
+        }
+
+        // ==================== Tabs ====================
+        function switchTab(tabName) {
+            document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabName));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + tabName));
+        }
+
+        // ==================== Backup ====================
+        function exportData() {
+            const data = {
+                app: 'خرداد مپ',
+                version: 1,
+                exportedAt: new Date().toISOString(),
+                favorites,
+                recentSearches,
+                settings
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `khordad-map-backup-${new Date().toISOString().slice(0, 10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('بکاپ دانلود شد');
+        }
+
+        function importData(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.favorites) favorites = data.favorites;
+                    if (data.recentSearches) recentSearches = data.recentSearches;
+                    if (data.settings) settings = { ...settings, ...data.settings };
+                    saveFavorites();
+                    saveRecent();
+                    saveSettings();
+                    renderFavorites();
+                    renderRecent();
+                    if (settings.darkMode) {
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        document.getElementById('themeToggle').classList.add('active');
+                    }
+                    showToast('داده‌ها بازیابی شد');
+                } catch (err) {
+                    showToast('فایل نامعتبر است');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function clearAllData() {
+            if (!confirm('همه علاقه‌مندی‌ها، تاریخچه و تنظیمات پاک شود؟')) return;
+            favorites = [];
+            recentSearches = [];
+            localStorage.removeItem(STORAGE.favorites);
+            localStorage.removeItem(STORAGE.recent);
+            localStorage.removeItem(STORAGE.settings);
+            renderFavorites();
+            renderRecent();
+            showToast('همه داده‌ها پاک شد');
+        }
+
+        // ==================== Events ====================
+        function initEvents() {
+            // Menu
+            document.getElementById('menuBtn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.add('open');
+            });
+            document.getElementById('sidebarClose').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('open');
+            });
+
+            // Tabs
+            document.querySelectorAll('.sidebar-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+
+            // Search
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const val = e.target.value.trim();
+                document.getElementById('clearSearch').style.display = val ? 'block' : 'none';
+                if (val.length >= 2) {
+                    searchTimeout = setTimeout(() => searchPlaces(val), 400);
+                } else {
+                    document.getElementById('searchResults').classList.remove('active');
+                }
+            });
+            searchInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    searchPlaces(searchInput.value.trim());
+                }
+            });
+            document.getElementById('searchBtn').addEventListener('click', () => {
+                searchPlaces(searchInput.value.trim());
+            });
+            document.getElementById('clearSearch').addEventListener('click', () => {
+                searchInput.value = '';
+                document.getElementById('clearSearch').style.display = 'none';
+                document.getElementById('searchResults').classList.remove('active');
+            });
+
+            // Click outside to close results
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-container') && !e.target.closest('.search-results')) {
+                    document.getElementById('searchResults').classList.remove('active');
+                }
+                if (!e.target.closest('#layersBtn') && !e.target.closest('#layerPanel')) {
+                    document.getElementById('layerPanel').classList.remove('active');
+                }
+            });
+
+            // Route
+            document.getElementById('routeBtn').addEventListener('click', calculateRoute);
+            document.getElementById('clearRouteBtn').addEventListener('click', clearRoute);
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentMode = btn.dataset.mode;
+                });
+            });
+
+            // Controls
+            document.getElementById('locateBtn').addEventListener('click', locateUser);
+            document.getElementById('layersBtn').addEventListener('click', () => {
+                document.getElementById('layerPanel').classList.toggle('active');
+            });
+            document.getElementById('measureBtn').addEventListener('click', toggleMeasure);
+            document.getElementById('themeBtn').addEventListener('click', toggleTheme);
+
+            document.querySelectorAll('.layer-option').forEach(opt => {
+                opt.addEventListener('click', () => switchLayer(opt.dataset.layer));
+            });
+
+            // Settings toggles
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('scaleToggle').addEventListener('click', function() {
+                this.classList.toggle('active');
+                settings.showScale = this.classList.contains('active');
+                if (settings.showScale) {
+                    scaleControl.addTo(map);
+                } else {
+                    map.removeControl(scaleControl);
+                }
+                saveSettings();
+            });
+            document.getElementById('saveSearchToggle').addEventListener('click', function() {
+                this.classList.toggle('active');
+                settings.saveSearches = this.classList.contains('active');
+                saveSettings();
+            });
+
+            // Backup
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            document.getElementById('clearDataBtn').addEventListener('click', clearAllData);
+            document.getElementById('importDataBtn').addEventListener('click', () => {
+                document.getElementById('importDataInput').click();
+            });
+            document.getElementById('importDataInput').addEventListener('change', (e) => {
+                if (e.target.files[0]) importData(e.target.files[0]);
+            });
+
+            // Double click measure clear
+            map.on('dblclick', () => {
+                if (measureMode) clearMeasure();
+            });
+        }
+
+        // ==================== Init ====================
+        function init() {
+            loadData();
+            initMap();
+            initEvents();
+            renderFavorites();
+            renderRecent();
+
+            // Apply scale setting
+            if (!settings.showScale && scaleControl) {
+                map.removeControl(scaleControl);
+                document.getElementById('scaleToggle').classList.remove('active');
+            }
+            if (!settings.saveSearches) {
+                document.getElementById('saveSearchToggle').classList.remove('active');
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
