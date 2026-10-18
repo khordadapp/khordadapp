@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="ویترین اپلیکیشن خرداد — سرگرمی، ابزار و محتوای کاربردی">
+<title>ویترین خرداد</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
+<script>
+  // اعمال فوری تم ذخیره‌شده روی دستگاه (قبل از رندر) تا چشمک نزنه
+  (function(){
+    try{
+      var t = localStorage.getItem('khordad_theme');
+      document.documentElement.setAttribute('data-theme', t === 'dark' ? 'dark' : 'light');
+    }catch(e){
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
+<style>
+  /* حالت روز (پیش‌فرض) */
+  :root, [data-theme="light"]{
+    --bg:#f4f6fb;
+    --surface:#ffffff;
+    --card:#ffffff;
+    --card-hover:#f0f4ff;
+    --border:rgba(0,0,0,.08);
+    --text:#1a1f36;
+    --muted:#5a6480;
+    --accent:#3b7cff;
+    --accent2:#6b4dff;
+    --gold:#d4a017;
+    --radius:18px;
+    --shadow:0 12px 40px rgba(0,0,0,.1);
+    --topbar-bg:rgba(255,255,255,.82);
+    --toast-bg:rgba(255,255,255,.96);
+    --body-gradient:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(59,124,255,.12), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(107,77,255,.1), transparent),
+      radial-gradient(ellipse 50% 30% at 50% 100%, rgba(212,160,23,.06), transparent);
+  }
+
+  /* حالت شب */
+  [data-theme="dark"]{
+    --bg:#0b0f1a;
+    --surface:#12182a;
+    --card:#171e33;
+    --card-hover:#1e2740;
+    --border:rgba(255,255,255,.08);
+    --text:#eef2ff;
+    --muted:#9aa3c0;
+    --accent:#4f8cff;
+    --accent2:#7c5cff;
+    --gold:#f0c14b;
+    --shadow:0 12px 40px rgba(0,0,0,.35);
+    --topbar-bg:rgba(11,15,26,.75);
+    --toast-bg:rgba(23,30,51,.95);
+    --body-gradient:
+      radial-gradient(ellipse 80% 50% at 20% -10%, rgba(79,140,255,.25), transparent),
+      radial-gradient(ellipse 60% 40% at 90% 10%, rgba(124,92,255,.2), transparent),
+      radial-gradient(ellipse 50% 30% at 50% 100%, rgba(240,193,75,.08), transparent);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth}
+
+  /* غیرفعال کردن انتخاب متن و کشیدن تصاویر */
+  body, body *{
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+    -webkit-touch-callout:none;
+  }
+  img{
+    -webkit-user-drag:none;
+    user-drag:none;
+    pointer-events:none;
+  }
+  a, button, .theme-btn{
+    pointer-events:auto;
+  }
+
+  body{
+    font-family:"Vazirmatn",Tahoma,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.7;
+    min-height:100vh;
+    transition:background .3s, color .3s;
+  }
+  a,button{outline:none;-webkit-tap-highlight-color:transparent}
+
+  /* ریپل خاکستری شبیه اندروید */
+  .ripple-host{position:relative;overflow:hidden}
+  .ripple-ink{
+    position:absolute;
+    border-radius:50%;
+    background:rgba(160,160,170,.35);
+    transform:scale(0);
+    pointer-events:none;
+    animation:android-ripple .55s ease-out forwards;
+  }
+  @keyframes android-ripple{
+    to{transform:scale(2.6);opacity:0}
+  }
+  body::before{
+    content:"";
+    position:fixed;inset:0;z-index:-1;
+    background:var(--body-gradient);
+    transition:background .3s;
+  }
+
+  /* Header */
+  .topbar{
+    position:sticky;top:0;z-index:50;
+    backdrop-filter:blur(16px);
+    background:var(--topbar-bg);
+    border-bottom:1px solid var(--border);
+    padding:12px 16px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;
+    transition:background .3s, border-color .3s;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem}
+  .brand-dot{
+    width:36px;height:36px;border-radius:50%;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:grid;place-items:center;font-size:14px;font-weight:800;
+    box-shadow:0 0 20px rgba(79,140,255,.4);
+  }
+  .topbar-actions{display:flex;gap:8px;align-items:center}
+  .chip{
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--muted);
+    padding:6px 12px;border-radius:999px;
+    font-size:.75rem;text-decoration:none;
+    transition:.2s;
+  }
+  .chip:hover{color:var(--text);border-color:var(--accent)}
+
+  /* دکمه حالت شب/روز */
+  .theme-btn{
+    width:36px;height:36px;border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--surface);
+    color:var(--text);
+    cursor:pointer;
+    display:grid;place-items:center;
+    font-size:16px;
+    transition:.2s;
+    flex-shrink:0;
+  }
+  .theme-btn:hover{
+    border-color:var(--accent);
+    background:var(--card-hover);
+  }
+
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+
+  /* Hero */
+  .hero{
+    margin:16px 0 28px;
+    border-radius:24px;
+    overflow:hidden;
+    position:relative;
+    box-shadow:var(--shadow);
+    border:1px solid var(--border);
+  }
+  .hero a{display:block}
+  .hero img{
+    width:100%;height:auto;display:block;
+    max-height:280px;object-fit:cover;
+  }
+  .hero-fallback{
+    min-height:180px;
+    background:linear-gradient(135deg,#1a2340,#2a1a50);
+    display:grid;place-items:center;
+    color:var(--muted);font-size:.95rem;
+  }
+
+  /* Section */
+  .section{margin-bottom:36px}
+  .section-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:14px;gap:10px;
+  }
+  .section-title{
+    font-size:1.15rem;font-weight:700;
+    display:flex;align-items:center;gap:8px;
+  }
+  .section-title::before{
+    content:"";width:4px;height:18px;border-radius:4px;
+    background:linear-gradient(var(--accent),var(--accent2));
+  }
+  .section-sub{color:var(--muted);font-size:.8rem}
+
+  /* Banner strip */
+  .banner-row{display:grid;gap:12px}
+  .banner-row a{
+    display:block;border-radius:var(--radius);overflow:hidden;
+    border:1px solid var(--border);background:var(--card);
+    transition:transform .2s, box-shadow .2s;
+  }
+  .banner-row a:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+  .banner-row img{width:100%;height:auto;display:block;max-height:100px;object-fit:cover}
+
+  /* Icon services grid */
+  .icon-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:10px;
+  }
+  .icon-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:10px 6px;
+    text-align:center;
+    text-decoration:none;color:var(--text);
+    transition:transform .2s, background .2s, border-color .2s;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+  }
+  .icon-card:hover{
+    transform:translateY(-4px);
+    background:var(--card-hover);
+    border-color:rgba(79,140,255,.35);
+  }
+  .icon-card img{
+    width:100%;max-width:72px;height:56px;
+    object-fit:contain;border-radius:10px;
+  }
+  .icon-card span{font-size:.7rem;color:var(--muted);line-height:1.3}
+
+  /* Content cards 2-col */
+  .content-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+  }
+  .content-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+    text-decoration:none;color:var(--text);
+    transition:transform .22s, box-shadow .22s, border-color .22s;
+    display:flex;flex-direction:column;
+  }
+  .content-card:hover{
+    transform:translateY(-5px);
+    box-shadow:var(--shadow);
+    border-color:rgba(124,92,255,.4);
+  }
+  .content-card .thumb{
+    aspect-ratio:16/10;
+    overflow:hidden;
+    background:linear-gradient(135deg,#1a2340,#2a1a50);
+    position:relative;
+  }
+  .content-card .thumb img{
+    width:100%;height:100%;object-fit:cover;
+    transition:transform .35s;
+  }
+  .content-card:hover .thumb img{transform:scale(1.06)}
+  .content-card .meta{
+    padding:12px 14px 14px;
+    font-size:.9rem;font-weight:600;
+  }
+  .content-card .meta small{
+    display:block;font-weight:400;color:var(--muted);
+    font-size:.75rem;margin-top:4px;
+  }
+
+  /* Partner row — نمایش کامل تصویر بدون برش ارتفاع */
+  .partner-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+  }
+  .partner-row a{
+    border-radius:var(--radius);overflow:hidden;
+    border:1px solid var(--border);background:var(--card);
+    transition:transform .2s;
+    display:flex;align-items:center;justify-content:center;
+    min-height:120px;
+  }
+  .partner-row a:hover{transform:translateY(-3px)}
+  .partner-row img{
+    width:100%;
+    height:auto;
+    display:block;
+    object-fit:contain;
+    max-height:none;
+  }
+
+  /* Triple feature */
+  .triple{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  .triple a{
+    border-radius:16px;overflow:hidden;
+    border:1px solid var(--border);background:var(--card);
+    transition:transform .2s;
+  }
+  .triple a:hover{transform:translateY(-3px)}
+  .triple img{width:100%;height:auto;display:block;aspect-ratio:1;object-fit:cover}
+
+  /* Service pills */
+  .service-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+  }
+  .service-card{
+    background:linear-gradient(160deg,var(--card),var(--surface));
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:14px 10px;
+    text-align:center;
+    text-decoration:none;color:var(--text);
+    transition:transform .2s, border-color .2s;
+  }
+  .service-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(79,140,255,.4);
+  }
+  .service-card img{
+    width:64px;height:64px;object-fit:contain;
+    border-radius:14px;margin-bottom:8px;
+  }
+  .service-card span{display:block;font-size:.78rem;color:var(--muted)}
+
+  /* Footer */
+  footer{
+    text-align:center;
+    padding:20px 16px 28px;
+    color:var(--muted);
+    font-size:.8rem;
+    margin-top:12px;
+  }
+
+  /* Image fallback placeholder */
+  .img-ph{
+    width:100%;height:100%;
+    min-height:60px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,#1e2a4a,#2d1f4e);
+    color:var(--muted);font-size:.75rem;
+    text-align:center;padding:8px;
+  }
+
+  /* Welcome toast */
+  .toast{
+    position:fixed;bottom:24px;left:50%;
+    transform:translateX(-50%) translateY(120px);
+    background:var(--toast-bg);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:12px 20px;border-radius:14px;
+    font-size:.85rem;z-index:100;
+    box-shadow:var(--shadow);
+    transition:transform .4s cubic-bezier(.2,.8,.2,1), background .3s, color .3s;
+    max-width:90vw;text-align:center;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  /* Back to top */
+  #toTop{
+    position:fixed;bottom:20px;left:20px;
+    width:44px;height:44px;border-radius:50%;
+    border:1px solid var(--border);
+    background:var(--surface);color:var(--text);
+    cursor:pointer;opacity:0;pointer-events:none;
+    transition:.25s;z-index:40;
+    display:grid;place-items:center;
+    font-size:18px;
+  }
+  #toTop.show{opacity:1;pointer-events:auto}
+  #toTop:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  @media (max-width:700px){
+    .icon-grid{grid-template-columns:repeat(4,1fr);gap:8px}
+    .content-grid{grid-template-columns:1fr 1fr;gap:10px}
+    .content-card .meta{font-size:.8rem;padding:10px}
+    .service-grid{grid-template-columns:repeat(3,1fr);gap:8px}
+    .triple{grid-template-columns:repeat(3,1fr);gap:8px}
+    .hero img{max-height:180px}
+  }
+  @media (max-width:420px){
+    .icon-grid{grid-template-columns:repeat(3,1fr)}
+    .service-grid{grid-template-columns:repeat(2,1fr)}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-dot">خ</div>
+    <span>ویترین خرداد</span>
+  </div>
+  <div class="topbar-actions">
+    <button class="theme-btn" id="themeToggle" type="button" title="تغییر حالت روز/شب" aria-label="تغییر حالت روز و شب">🌙</button>
+    <a class="chip" href="https://khordadapp.github.io/khordadapp/gapzehn.html" target="_blank" rel="noopener">گفت‌وگو</a>
+
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- Hero -->
+  <section class="hero">
+    <a href="#" target="_blank" rel="noopener" title="گفت‌وگوی خرداد">
+      <img src="https://abrehamrahi.ir/o/public/pBiC8hG4/" alt="گفت‌وگوی خرداد"
+           onerror="this.onerror=null;this.parentElement.innerHTML='<div class=\'hero-fallback\'>گفت‌وگوی خرداد — برای ورود کلیک کنید</div>';">
+    </a>
+  </section>
+
+  <!-- Music / external banner -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">پیشنهاد ویژه</h2>
+    </div>
+    <div class="banner-row">
+      <a href="https://navaak.com/" target="_blank" rel="noopener" title="نواک">
+        <img src="https://abrehamrahi.ir/o/public/QFQ2Tojs/" alt="نواک"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\'>نواک</div>';">
+      </a>
+    </div>
+  </section>
+
+  <!-- Quick icon links -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">دسترسی سریع</h2>
+      <span class="section-sub">ابزار و بخش‌های پرکاربرد</span>
+    </div>
+    <div class="icon-grid">
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/mazhabi.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/V378JmgW/" alt="رمضان"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>رمضان</div>';">
+        <span>مذهبی</span>
+      </a>
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/rotbe.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/G0nhkFDd/" alt="رتبه‌بندی"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>رتبه</div>';">
+        <span>رتبه‌بندی</span>
+      </a>
+      <a class="icon-card" href="https://www.salamatnews.com/" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/Wbmlsy04/" alt="سلامت"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>سلامت</div>';">
+        <span>سلامت‌نیوز</span>
+      </a>
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/maghale.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/O1nZrOok/" alt="مقالات"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>مقاله</div>';">
+        <span>مقالات</span>
+      </a>
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/wether.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/L8ap1X85/" alt="هواشناسی"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>هوا</div>';">
+        <span>هواشناسی</span>
+      </a>
+      <a class="icon-card" href="https://www.farsnews.ir/" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/xMfiTETn/" alt="فارس"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>خبر</div>';">
+        <span>فارس‌نیوز</span>
+      </a>
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/sheba.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/sQwzfPDq/" alt="شبا"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>شبا</div>';">
+        <span>شبا</span>
+      </a>
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/football.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/c6ZM83sk/" alt="فوتبال"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>فوتبال</div>';">
+        <span>فوتبال</span>
+      </a>
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/gapzehn.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/1K0fp4ss/" alt="گفت‌وگو"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>چت</div>';">
+        <span>گفت‌وگو</span>
+      </a>
+      <a class="icon-card" href="http://worldwariv.ir.m.ihweb.ir/bazi.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/1QJgKaG0/" alt="بازی"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'height:56px;border-radius:10px\'>بازی</div>';">
+        <span>بازی</span>
+      </a>
+    </div>
+  </section>
+
+  
+
+
+  <!-- Game banner -->
+  <section class="section">
+    <div class="banner-row">
+      <a href="http://worldwariv.ir.m.ihweb.ir/bazi.html" target="_blank" rel="noopener" title="بازی">
+        <img src="https://abrehamrahi.ir/o/public/0Xhe2HaS/" alt="بازی خرداد"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'min-height:80px\'>بخش بازی</div>';">
+      </a>
+    </div>
+  </section>
+
+  <!-- Wide banner -->
+  <section class="section">
+    <div class="banner-row">
+      <div style="border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--card)">
+   
+
+
+      </a>
+    </div>
+  </section>
+
+
+
+  <!-- Services -->
+  <section class="section" id="services">
+    <div class="section-head">
+      <h2 class="section-title">خدمات و پشتیبانی</h2>
+      <span class="section-sub">۶ مسیر ارتباطی</span>
+    </div>
+    <div class="service-grid">
+      <a class="service-card" href="https://survey.porsline.ir/s/ytk388A7" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/NV1ky0hB/" alt="نظرسنجی"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>📋</div>';">
+        <span>نظرسنجی</span>
+      </a>
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/ghavanin.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/GKAdu0m2/" alt="قوانین"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>📜</div>';">
+        <span>قوانین</span>
+      </a>
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/salb.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/9KdSekxz/" alt="سوالات"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>❓</div>';">
+        <span>سوالات متداول</span>
+      </a>
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/daryaft.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/VluyY8zZ/" alt="پشتیبانی"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>💬</div>';">
+        <span>پشتیبانی</span>
+      </a>
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/rasmi.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/LeazoOh3/" alt="رسمی"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>🏛️</div>';">
+        <span>بخش رسمی</span>
+      </a>
+      <a class="service-card" href="http://worldwariv.ir.m.ihweb.ir/ideh.html" target="_blank" rel="noopener">
+        <img src="https://abrehamrahi.ir/o/public/e8gMHmwX/" alt="پیشنهاد"
+             onerror="this.onerror=null;this.outerHTML='<div class=\'img-ph\' style=\'width:64px;height:64px;border-radius:14px;margin:0 auto 8px\'>💡</div>';">
+        <span>پیشنهادات</span>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div id="lastVisit" style="font-size:.72rem;opacity:.75"></div>
+</footer>
+
+<div class="toast" id="toast">به خرداد خوش آمدید 👋<br><small style="color:var(--muted)">نسل جدید ویترین خرداد</small></div>
+<button id="toTop" title="بالای صفحه" type="button">↑</button>
+
+<script>
+(function(){
+  // ===== ذخیره و بازیابی روی دستگاه کاربر (localStorage) =====
+  function storeGet(key){
+    try{
+      if(window.localStorage) return window.localStorage.getItem(key);
+    }catch(e){}
+    return null;
+  }
+  function storeSet(key, val){
+    try{
+      if(window.localStorage){
+        window.localStorage.setItem(key, val);
+        return true;
+      }
+    }catch(e){}
+    return false;
+  }
+
+  // ===== حالت روز/شب (پیش‌فرض: روز) — ذخیره روی دستگاه =====
+  var THEME_KEY = 'khordad_theme';
+  var root = document.documentElement;
+  var themeBtn = document.getElementById('themeToggle');
+
+  function applyTheme(theme){
+    if(theme !== 'dark' && theme !== 'light') theme = 'light';
+    root.setAttribute('data-theme', theme);
+    if(themeBtn){
+      themeBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+      themeBtn.title = theme === 'dark' ? 'حالت روز' : 'حالت شب';
+    }
+  }
+
+  // خواندن تم ذخیره‌شده از حافظه دستگاه؛ اگر نبود → روز
+  var savedTheme = storeGet(THEME_KEY);
+  applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
+
+  if(themeBtn){
+    themeBtn.addEventListener('click', function(){
+      var current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      var next = current === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      storeSet(THEME_KEY, next); // ذخیره دائمی روی دستگاه کاربر
+    });
+  }
+
+  // ===== دیالوگ خوش‌آمدگویی فقط یک‌بار (ذخیره روی دستگاه) =====
+  var WELCOME_KEY = 'khordad_welcome_seen';
+  var toast = document.getElementById('toast');
+  var seen = storeGet(WELCOME_KEY) === '1';
+  if(!seen && toast){
+    setTimeout(function(){ toast.classList.add('show'); }, 400);
+    setTimeout(function(){ toast.classList.remove('show'); }, 4500);
+    storeSet(WELCOME_KEY, '1'); // بعد از نمایش دیگه نشون داده نشه
+  }
+
+  // ===== دکمه بازگشت به بالا =====
+  var btn = document.getElementById('toTop');
+  window.addEventListener('scroll', function(){
+    if (window.scrollY > 400) btn.classList.add('show');
+    else btn.classList.remove('show');
+  });
+  if(btn){
+    btn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+  }
+
+  // ===== ریپل خاکستری شبیه اندروید روی همه لینک‌ها =====
+  function makeRipple(e){
+    var el = e.currentTarget;
+    if (!el.classList.contains('ripple-host')) el.classList.add('ripple-host');
+    var rect = el.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height);
+    var ink = document.createElement('span');
+    ink.className = 'ripple-ink';
+    ink.style.width = ink.style.height = size + 'px';
+    var x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left - size / 2;
+    var y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top - size / 2;
+    ink.style.left = x + 'px';
+    ink.style.top = y + 'px';
+    el.appendChild(ink);
+    setTimeout(function(){ ink.remove(); }, 560);
+  }
+  document.querySelectorAll('a[href]').forEach(function(a){
+    a.classList.add('ripple-host');
+    a.addEventListener('pointerdown', makeRipple, {passive:true});
+  });
+
+  // ===== نمایش بازدید قبلی + ثبت بازدید فعلی =====
+  var prev = storeGet('khordad_vitrin_last');
+  var lv = document.getElementById('lastVisit');
+  if (prev && lv) lv.textContent = 'آخرین بازدید شما: ' + prev;
+  var now = new Date();
+  var label = now.toLocaleDateString('fa-IR') + ' — ' + now.toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'});
+  storeSet('khordad_vitrin_last', label);
+
+  // ===== لود نرم تصاویر =====
+  document.querySelectorAll('img').forEach(function(img){
+    if (img.complete) return;
+    img.style.opacity = '0';
+    img.style.transition = 'opacity .35s ease';
+    img.addEventListener('load', function(){ img.style.opacity = '1'; });
+    img.addEventListener('error', function(){ img.style.opacity = '1'; });
+  });
+
+  // جلوگیری از منوی راست‌کلیک روی تصاویر
+  document.addEventListener('contextmenu', function(e){
+    if(e.target && e.target.tagName === 'IMG') e.preventDefault();
+  });
+})();
+</script>
+</body>
+</html>
